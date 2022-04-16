@@ -1,12 +1,11 @@
 const AkairoError = require('../../util/AkairoError');
-const AkairoHandler = require('../../index');
+const AkairoHandler = require('../AkairoHandler');
 const AkairoMessage = require('../../util/AkairoMessage');
 const { BuiltInReasons, CommandHandlerEvents } = require('../../util/Constants');
 // eslint-disable-next-line no-unused-vars
-const { CommandInteraction, AutocompleteInteraction, Snowflake } = require('discord.js');
-const { Collection } = require('discord.js');
-const SlashCommand = require('./SlashCommand');
+const { CommandInteraction, AutocompleteInteraction, Snowflake, Collection } = require('discord.js');
 const { isPromise } = require('../../util/Util');
+const SlashCommand = require('./SlashCommand');
 
 class SlashCommandHandler extends AkairoHandler {
     constructor(client, {
