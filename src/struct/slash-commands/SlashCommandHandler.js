@@ -5,6 +5,7 @@ const { BuiltInReasons, CommandHandlerEvents } = require('../../util/Constants')
 // eslint-disable-next-line no-unused-vars
 const { CommandInteraction, AutocompleteInteraction, Snowflake, Collection } = require('discord.js');
 const { isPromise } = require('../../util/Util');
+const TypeResolver = require('../commands/arguments/TypeResolver');
 const SlashCommand = require('./SlashCommand');
 
 class SlashCommandHandler extends AkairoHandler {
@@ -27,6 +28,12 @@ class SlashCommandHandler extends AkairoHandler {
             automateCategories,
             loadFilter
         });
+
+        /**
+         * The type resolver.
+         * @type {TypeResolver}
+         */
+        this.resolver = new TypeResolver(this);
 
         /**
          * Collecion of command names.
