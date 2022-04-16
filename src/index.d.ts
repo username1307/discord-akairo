@@ -339,7 +339,7 @@ declare module 'discord-akairo' {
     }
 
     export class SlashCommandHandler extends AkairoHandler {
-        public constructor(client: AkairoClient, options: SlashCommandOptions);
+        public constructor(client: AkairoClient, options: SlashCommandHandlerOptions);
 
         public categories: Collection<string, Category<string, SlashCommand>>;
         public classToHandle: typeof SlashCommand;
@@ -669,6 +669,10 @@ declare module 'discord-akairo' {
         ignorePermissions?: Snowflake | Snowflake[] | IgnoreCheckPredicate;
         prefix?: string | string[] | PrefixSupplier;
         storeMessages?: boolean;
+    }
+
+    export interface SlashCommandHandlerOptions extends AkairoHandlerOptions {
+        ignorePermissions?: Snowflake | Snowflake[] | IgnoreCheckPredicate;
     }
 
     export interface ContentParserResult {
