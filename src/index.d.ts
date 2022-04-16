@@ -444,7 +444,7 @@ declare module 'discord-akairo' {
         public reloadAll(): this;
         public remove(id: string): Inhibitor;
         public removeAll(): this;
-        public test(type: 'all' | 'pre' | 'post', message: Message, command?: Command): Promise<string | void>;
+        public test(type: 'all' | 'pre' | 'post', message: Message | AkairoMessage, command?: Command | SlashCommand): Promise<string | void>;
         public on(event: 'remove', listener: (inhibitor: Inhibitor) => any): this;
         public on(event: 'load', listener: (inhibitor: Inhibitor, isReload: boolean) => any): this;
     }

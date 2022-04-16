@@ -227,19 +227,27 @@ class SlashCommandHandler extends AkairoHandler {
      * @returns {Promise<boolean>}
      */
     async runPostTypeInhibitors(message, command) {
+        const event = CommandHandlerEvents.COMMAND_BLOCKED;
+
         if (command.ownerOnly) {
             const isOwner = this.client.isOwner(message.author);
             if (!isOwner) {
-                this.emit(CommandHandlerEvents.COMMAND_BLOCKED, message, command, BuiltInReasons.OWNER);
+                this.emit(event, message, command, BuiltInReasons.OWNER);
                 return true;
             }
-        } else if (command.channel === 'guild' && !message.guild) {
-            this.emit(CommandHandlerEvents.COMMAND_BLOCKED, message, command, BuiltInReasons.GUILD);
+        }
+
+        if (command.channel === 'guild' && !message.guild) {
+            this.emit(event, message, command, BuiltInReasons.GUILD);
             return true;
-        } else if (command.channel === 'dm' && message.guild) {
-            this.emit(CommandHandlerEvents.COMMAND_BLOCKED, message, command, BuiltInReasons.DM);
+        }
+
+        if (command.channel === 'dm' && message.guild) {
+            this.emit(event, message, command, BuiltInReasons.DM);
             return true;
-        } else if (await this.runPermissionChecks(message, command)) {
+        }
+
+        if (await this.runPermissionChecks(message, command)) {
             return true;
         }
 
@@ -247,8 +255,13 @@ class SlashCommandHandler extends AkairoHandler {
             ? await this.inhibitorHandler.test('post', message, command)
             : null;
 
+
+        if (await this.runPermissionChecks(message, command)) {
+            return true;
+        }
+
         if (reason != null) {
-            this.emit(CommandHandlerEvents.COMMAND_BLOCKED, message, command, reason);
+            this.emit(event, message, command, reason);
             return true;
         }
 

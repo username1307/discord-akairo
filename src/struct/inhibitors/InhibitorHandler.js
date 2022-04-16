@@ -47,7 +47,7 @@ class InhibitorHandler extends AkairoHandler {
      * Returns the reason if blocked.
      * @param {string} type - Type of inhibitor, 'all', 'pre', or 'post'.
      * @param {Message | AkairoMessage} message - Message to test.
-     * @param {Command} [command] - Command to use.
+     * @param {Command | SlashCommand} [command] - Command to use.
      * @returns {Promise<string|void>}
      */
     async test(type, message, command) {
