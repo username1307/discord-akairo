@@ -194,12 +194,6 @@ class SlashCommandHandler extends AkairoHandler {
 
         if (reason != null) {
             this.emit(CommandHandlerEvents.MESSAGE_BLOCKED, message, reason);
-        } else if (this.blockClient && message.author.id === this.client.user.id) {
-            this.emit(CommandHandlerEvents.MESSAGE_BLOCKED, message, BuiltInReasons.CLIENT);
-        } else if (this.blockBots && message.author.bot) {
-            this.emit(CommandHandlerEvents.MESSAGE_BLOCKED, message, BuiltInReasons.BOT);
-        } else if (this.hasPrompt(message.channel, message.author)) {
-            this.emit(CommandHandlerEvents.IN_PROMPT, message);
         } else {
             return false;
         }
@@ -264,7 +258,7 @@ class SlashCommandHandler extends AkairoHandler {
             return true;
         }
 
-        return !!this.runCooldowns(message, command);
+        return false;
     }
 
     /**
