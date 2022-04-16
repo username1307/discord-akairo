@@ -323,6 +323,22 @@ class SlashCommandHandler extends AkairoHandler {
     }
 
     /**
+     * Handles errors from the handling.
+     * @param {Error} err - The error.
+     * @param {AkairoMessage} message - Message that called the command.
+     * @param {SlashCommand} [command] - Command that errored.
+     * @returns {void}
+     */
+    emitError(err, message, command) {
+        if (this.listenerCount(CommandHandlerEvents.ERROR)) {
+            this.emit(CommandHandlerEvents.ERROR, err, message, command);
+            return;
+        }
+
+        throw err;
+    }
+
+    /**
      * Finds a command
      * @param {string} name - Name to find with
      * @returns {SlashCommand}
