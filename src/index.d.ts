@@ -352,8 +352,8 @@ declare module 'discord-akairo' {
         public ignorePermissions?: Snowflake | Snowflake[] | IgnoreCheckPredicate;
         public name: string;
         public ownerOnly: boolean;
-        public parentCommand?: string;
-        public shortName?: string;
+        public parentCommandName?: string;
+        public shortCommandName?: string;
         public userPermissions: PermissionResolvable | PermissionResolvable[] | MissingPermissionSupplier;
 
         public exec(interaction: CommandInteraction): any;
@@ -784,7 +784,7 @@ declare module 'discord-akairo' {
         ignorePermissions?: Snowflake | Snowflake[] | IgnoreCheckPredicate;
         name: string;
         ownerOnly?: boolean;
-        parentCommand?: string;
+        parentCommandName?: string;
         shortCommandName?: string;
         userPermissions?: PermissionResolvable | PermissionResolvable[] | MissingPermissionSupplier;
     }
