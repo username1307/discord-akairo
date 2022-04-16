@@ -233,19 +233,13 @@ class SlashCommandHandler extends AkairoHandler {
                 this.emit(CommandHandlerEvents.COMMAND_BLOCKED, message, command, BuiltInReasons.OWNER);
                 return true;
             }
-        }
-
-        if (command.channel === 'guild' && !message.guild) {
+        } else if (command.channel === 'guild' && !message.guild) {
             this.emit(CommandHandlerEvents.COMMAND_BLOCKED, message, command, BuiltInReasons.GUILD);
             return true;
-        }
-
-        if (command.channel === 'dm' && message.guild) {
+        } else if (command.channel === 'dm' && message.guild) {
             this.emit(CommandHandlerEvents.COMMAND_BLOCKED, message, command, BuiltInReasons.DM);
             return true;
-        }
-
-        if (await this.runPermissionChecks(message, command)) {
+        } else if (await this.runPermissionChecks(message, command)) {
             return true;
         }
 
