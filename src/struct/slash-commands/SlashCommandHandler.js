@@ -89,11 +89,13 @@ class SlashCommandHandler extends AkairoHandler {
      */
     register(command, filepath) {
         super.register(command, filepath);
+        const name = command.name.toLowerCase();
 
-        const conflict = this.names.get(command.name.toLowerCase());
+        const conflict = this.names.get(name);
         if (conflict) {
             throw new AkairoError('ALIAS_CONFLICT', command.name, command.id, conflict);
         }
+        this.names.set(name, command.id);
     }
 
     /**
