@@ -344,6 +344,7 @@ declare module 'discord-akairo' {
         public channel?: string;
         public client: AkairoClient;
         public clientPermissions: PermissionResolvable | PermissionResolvable[] | MissingPermissionSupplier;
+        public commandType: 'command' | 'group' | 'sub';
         public description: string | any;
         public filepath: string;
         public handler: CommandHandler;
@@ -351,6 +352,8 @@ declare module 'discord-akairo' {
         public ignorePermissions?: Snowflake | Snowflake[] | IgnoreCheckPredicate;
         public name: string;
         public ownerOnly: boolean;
+        public parentCommand?: string;
+        public shortName?: string;
         public userPermissions: PermissionResolvable | PermissionResolvable[] | MissingPermissionSupplier;
 
         public exec(interaction: CommandInteraction): any;
@@ -776,10 +779,13 @@ declare module 'discord-akairo' {
         args?: SlashOption[];
         channel?: 'guild' | 'dm';
         clientPermissions?: PermissionResolvable | PermissionResolvable[] | MissingPermissionSupplier;
+        commandType: 'command' | 'group' | 'sub';
         description?: string | any;
         ignorePermissions?: Snowflake | Snowflake[] | IgnoreCheckPredicate;
         name: string;
         ownerOnly?: boolean;
+        parentCommand?: string;
+        shortCommandName?: string;
         userPermissions?: PermissionResolvable | PermissionResolvable[] | MissingPermissionSupplier;
     }
 

@@ -8,7 +8,10 @@ class SlashCommand extends AkairoModule {
         const {
             args = [],
             channel = null,
+            commandType,
             name = '',
+            parentCommandName,
+            shortCommandName = '',
             ownerOnly = false,
             description = '',
             clientPermissions = this.clientPermissions,
@@ -21,6 +24,24 @@ class SlashCommand extends AkairoModule {
          * @type {?any}
          */
         this.args = args;
+
+        /**
+         * The type of slash command.
+         * @type {?string}
+         */
+        this.commandType = commandType;
+
+        /**
+         * The name of a sub commands or sub command group parent command.
+         * @type {?string}
+         */
+        this.parentCommandName = parentCommandName;
+
+        /**
+         * The short name of a sub commands or sub command group.
+         * @type {?string}
+         */
+        this.shortCommandName = shortCommandName;
 
         /**
          * Usable only in this channel type.
