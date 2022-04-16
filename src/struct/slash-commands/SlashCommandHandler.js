@@ -157,6 +157,11 @@ class SlashCommandHandler extends AkairoHandler {
         }
     }
 
+    /**
+     * Handles autocomplete.
+     * @param {AutocompleteInteraction} interaction - Interaction to handle.
+     * @returns {void}
+     */
     handleAutocomplete(interaction) {
         const commandName = this.getCommandName(interaction);
         const commandModule = this.findCommand(commandName);
@@ -332,6 +337,179 @@ class SlashCommandHandler extends AkairoHandler {
         }
         return commandName;
     }
+
+    /**
+     * Set the inhibitor handler to use.
+     * @param {InhibitorHandler} inhibitorHandler - The inhibitor handler.
+     * @returns {SlashCommandHandler}
+     */
+    useInhibitorHandler(inhibitorHandler) {
+        this.inhibitorHandler = inhibitorHandler;
+        this.resolver.inhibitorHandler = inhibitorHandler;
+
+        return this;
+    }
+
+    /**
+     * Set the listener handler to use.
+     * @param {ListenerHandler} listenerHandler - The listener handler.
+     * @returns {SlashCommandHandler}
+     */
+    useListenerHandler(listenerHandler) {
+        this.resolver.listenerHandler = listenerHandler;
+
+        return this;
+    }
+
+    /**
+     * Loads a slash command.
+     * @method
+     * @name SlashCommandHandler#load
+     * @param {string|SlashCommand} thing - Module or path to module.
+     * @returns {SlashCommand}
+     */
+
+    /**
+     * Reads all slash commands from the directory and loads them.
+     * @method
+     * @name SlashCommandHandler#loadAll
+     * @param {string} [directory] - Directory to load from.
+     * Defaults to the directory passed in the constructor.
+     * @param {LoadPredicate} [filter] - Filter for files, where true means it should be loaded.
+     * @returns {SlashCommandHandler}
+     */
+
+    /**
+     * Removes a slash command.
+     * @method
+     * @name SlashCommandHandler#remove
+     * @param {string} id - ID of the command.
+     * @returns {SlashCommand}
+     */
+
+    /**
+     * Removes all slash commands.
+     * @method
+     * @name SlashCommandHandler#removeAll
+     * @returns {SlashCommandHandler}
+     */
+
+    /**
+     * Reloads a slash command.
+     * @method
+     * @name SlashCommandHandler#reload
+     * @param {string} id - ID of the command.
+     * @returns {SlashCommand}
+     */
+
+    /**
+     * Reloads all slash commands.
+     * @method
+     * @name SlashCommandHandler#reloadAll
+     * @returns {SlashCommandHandler}
+     */
 }
 
 module.exports = SlashCommandHandler;
+
+/**
+ * Emitted when a slash command is blocked by a pre-message inhibitor.
+ * The built-in inhibitors are 'client' and 'bot'.
+ * @event SlashCommandHandler#commandBlocked
+ * @param {AkairoMessage} message - Message sent.
+ * @param {string} reason - Reason for the block.
+ */
+
+/**
+ * Emitted when no command was found.
+ * @event CommandHandler#commandNotFound
+ * @param {AkairoMessage} message - Message received.
+ */
+
+/**
+ * Emitted when a command is found disabled.
+ * @event SlashCommandHandler#commandDisabled
+ * @param {AkairoMessage} message - Message sent.
+ * @param {SlashCommand} command - Command found.
+ */
+
+/**
+ * Emitted when a command is blocked by a post-message inhibitor.
+ * The built-in inhibitors are 'owner', 'guild', and 'dm'.
+ * @event SlashCommandHandler#commandBlocked
+ * @param {AkairoMessage} message - Message sent.
+ * @param {SlashCommand} command - Command blocked.
+ * @param {string} reason - Reason for the block.
+ */
+
+/**
+ * Emitted when a command starts execution.
+ * @event SlashCommandHandler#commandStarted
+ * @param {AkairoMessage} message - Message sent.
+ * @param {SlashCommand} command - Command executed.
+ * @param {any} args - The args passed to the command.
+ */
+
+/**
+ * Emitted when a command finishes execution.
+ * @event SlashCommandHandler#commandFinished
+ * @param {AkairoMessage} message - Message sent.
+ * @param {SlashCommand} command - Command executed.
+ * @param {any} args - The args passed to the command.
+ * @param {any} returnValue - The command's return value.
+ */
+
+/**
+ * Emitted when a permissions check is failed.
+ * @event SlashCommandHandler#missingPermissions
+ * @param {AkairoMessage} message - Message sent.
+ * @param {SlashCommand} command - Command blocked.
+ * @param {string} type - Either 'client' or 'user'.
+ * @param {any} missing - The missing permissions.
+ */
+
+/**
+ * Emitted when a command or inhibitor errors.
+ * @event SlashCommandHandler#error
+ * @param {Error} error - The error.
+ * @param {AkairoMessage} message - Message sent.
+ * @param {?SlashCommand} command - Command executed.
+ */
+
+/**
+ * Emitted when a command is loaded.
+ * @event SlashCommandHandler#load
+ * @param {SlashCommand} command - Module loaded.
+ * @param {boolean} isReload - Whether or not this was a reload.
+ */
+
+/**
+ * Emitted when a command is removed.
+ * @event SlashCommandHandler#remove
+ * @param {SlashCommand} command - Command removed.
+ */
+
+/**
+ * Also includes properties from AkairoHandlerOptions.
+ * @typedef {AkairoHandlerOptions} SlashCommandHandlerOptions
+ * @prop {Snowflake|Snowflake[]|IgnoreCheckPredicate} [ignorePermissions=[]] - ID of user(s) to ignore `userPermissions` checks or a function to ignore.
+ */
+
+/**
+ * Various parsed components of the message.
+ * @typedef {Object} ParsedComponentData
+ * @prop {?Command} command - The command used.
+ * @prop {?string} prefix - The prefix used.
+ * @prop {?string} alias - The alias used.
+ * @prop {?string} content - The content to the right of the alias.
+ * @prop {?string} afterPrefix - The content to the right of the prefix.
+ */
+
+/**
+ * A function that returns whether this message should be ignored for a certain check.
+ * @typedef {Function} IgnoreCheckPredicate
+ * @param {Message} message - Message to check.
+ * @param {Command} command - Command to check.
+ * @returns {boolean}
+ */
+
