@@ -14,6 +14,8 @@
   </p>
 </div>
 
+Custom Version of Akairo for LHWB. Not intended for use with other bots.
+
 ## Features
 
 #### Completely modular commands, inhibitors, and listeners.

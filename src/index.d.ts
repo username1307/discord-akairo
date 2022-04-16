@@ -1,12 +1,33 @@
 declare module 'discord-akairo' {
     import {
-    BufferResolvable, Client, ClientOptions, Collection,
-    Message, MessageAttachment, MessageEmbed,
-    MessageEditOptions, MessageOptions, MessagePayload,
-    User, UserResolvable, GuildMember,
-    Channel, Role, Emoji, Guild, ReplyMessageOptions,
-    PermissionResolvable, Snowflake, CommandInteraction, AutocompleteInteraction
-    } from 'discord.js';
+    BufferResolvable,
+    Client,
+    ClientOptions,
+    Collection,
+    Message,
+    MessageAttachment,
+    MessageEmbed,
+    MessageEditOptions,
+    MessageOptions,
+    MessagePayload,
+    User,
+    UserResolvable,
+    GuildMember,
+    Channel,
+    Role,
+    Emoji,
+    Guild,
+    ReplyMessageOptions,
+    PermissionResolvable,
+    Snowflake,
+    CommandInteraction,
+    AutocompleteInteraction,
+    ApplicationCommandSubGroupData,
+    ApplicationCommandSubCommandData,
+    ApplicationCommandChoicesData,
+    ApplicationCommandAutocompleteOption,
+    ApplicationCommandNumericOptionData, ApplicationCommandNonOptionsData, ApplicationCommandChannelOptionData
+} from 'discord.js';
 
     import { EventEmitter } from 'events';
     import { Stream } from 'stream';
@@ -543,6 +564,54 @@ declare module 'discord-akairo' {
         public static isPromise(value: any): boolean;
     }
 
+    export interface AkairoApplicationCommandSubGroupData
+        extends ApplicationCommandSubGroupData {
+        options?: AkairoApplicationCommandSubCommandData[];
+    }
+
+    export interface AkairoApplicationCommandSubCommandData
+        extends ApplicationCommandSubCommandData {
+        options?: (
+            | AkairoApplicationCommandChoicesData
+            | AkairoApplicationCommandNonOptionsData
+            | AkairoApplicationCommandChannelOptionData
+            )[];
+    }
+
+    export interface AkairoApplicationCommandChoicesData
+        extends ApplicationCommandChoicesData {
+        resolve?: SlashResolveTypes;
+    }
+
+    export interface AkairoApplicationCommandAutocompleteOption
+        extends ApplicationCommandAutocompleteOption {
+        resolve?: SlashResolveTypes;
+    }
+
+    export interface AkairoApplicationCommandNumericOptionData
+        extends ApplicationCommandNumericOptionData {
+        resolve?: SlashResolveTypes;
+    }
+
+    export interface AkairoApplicationCommandNonOptionsData
+        extends ApplicationCommandNonOptionsData {
+        resolve?: SlashResolveTypes;
+    }
+
+    export interface AkairoApplicationCommandChannelOptionData
+        extends ApplicationCommandChannelOptionData {
+        resolve?: SlashResolveTypes;
+    }
+
+    export type AkairoApplicationCommandOptionData =
+        | AkairoApplicationCommandSubGroupData
+        | AkairoApplicationCommandNonOptionsData
+        | AkairoApplicationCommandChannelOptionData
+        | AkairoApplicationCommandChoicesData
+        | AkairoApplicationCommandAutocompleteOption
+        | AkairoApplicationCommandNumericOptionData
+        | AkairoApplicationCommandSubCommandData;
+
     export interface AkairoHandlerOptions {
         automateCategories?: boolean;
         classToHandle?: Function;
@@ -642,17 +711,6 @@ declare module 'discord-akairo' {
         quoted?: boolean;
     }
 
-    export interface SlashCommandOptions extends AkairoModuleOptions {
-        args?: ArgumentOptions[] | ArgumentGenerator;
-        channel?: 'guild' | 'dm';
-        clientPermissions?: PermissionResolvable | PermissionResolvable[] | MissingPermissionSupplier;
-        description?: string | any;
-        ignorePermissions?: Snowflake | Snowflake[] | IgnoreCheckPredicate;
-        name: string;
-        ownerOnly?: boolean;
-        userPermissions?: PermissionResolvable | PermissionResolvable[] | MissingPermissionSupplier;
-    }
-
     export interface CommandHandlerOptions extends AkairoHandlerOptions {
         aliasReplacement?: RegExp;
         allowMention?: boolean | MentionPrefixPredicate;
@@ -669,10 +727,6 @@ declare module 'discord-akairo' {
         ignorePermissions?: Snowflake | Snowflake[] | IgnoreCheckPredicate;
         prefix?: string | string[] | PrefixSupplier;
         storeMessages?: boolean;
-    }
-
-    export interface SlashCommandHandlerOptions extends AkairoHandlerOptions {
-        ignorePermissions?: Snowflake | Snowflake[] | IgnoreCheckPredicate;
     }
 
     export interface ContentParserResult {
@@ -716,6 +770,21 @@ declare module 'discord-akairo' {
     export interface ProviderOptions {
         dataColumn?: string;
         idColumn?: string;
+    }
+
+    export interface SlashCommandOptions extends AkairoModuleOptions {
+        args?: SlashOption[];
+        channel?: 'guild' | 'dm';
+        clientPermissions?: PermissionResolvable | PermissionResolvable[] | MissingPermissionSupplier;
+        description?: string | any;
+        ignorePermissions?: Snowflake | Snowflake[] | IgnoreCheckPredicate;
+        name: string;
+        ownerOnly?: boolean;
+        userPermissions?: PermissionResolvable | PermissionResolvable[] | MissingPermissionSupplier;
+    }
+
+    export interface SlashCommandHandlerOptions extends AkairoHandlerOptions {
+        ignorePermissions?: Snowflake | Snowflake[] | IgnoreCheckPredicate;
     }
 
     export type StringData = {
@@ -785,6 +854,22 @@ declare module 'discord-akairo' {
         => string | MessageOptions | Promise<string | MessageOptions>;
 
     export type RegexSupplier = (message: Message) => RegExp;
+
+    export type SlashOption = AkairoApplicationCommandOptionData & {
+        resolve?: SlashResolveTypes;
+    };
+
+    export type SlashResolveTypes =
+        | 'boolean'
+        | 'channel'
+        | 'string'
+        | 'integer'
+        | 'number'
+        | 'user'
+        | 'member'
+        | 'role'
+        | 'mentionable'
+        | 'message';
 
     export const Constants: {
         ArgumentMatches: {
