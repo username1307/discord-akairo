@@ -227,23 +227,21 @@ class SlashCommandHandler extends AkairoHandler {
      * @returns {Promise<boolean>}
      */
     async runPostTypeInhibitors(message, command) {
-        const event = CommandHandlerEvents.COMMAND_BLOCKED;
-
         if (command.ownerOnly) {
             const isOwner = this.client.isOwner(message.author);
             if (!isOwner) {
-                this.emit(event, message, command, BuiltInReasons.OWNER);
+                this.emit(CommandHandlerEvents.COMMAND_BLOCKED, message, command, BuiltInReasons.OWNER);
                 return true;
             }
         }
 
         if (command.channel === 'guild' && !message.guild) {
-            this.emit(event, message, command, BuiltInReasons.GUILD);
+            this.emit(CommandHandlerEvents.COMMAND_BLOCKED, message, command, BuiltInReasons.GUILD);
             return true;
         }
 
         if (command.channel === 'dm' && message.guild) {
-            this.emit(event, message, command, BuiltInReasons.DM);
+            this.emit(CommandHandlerEvents.COMMAND_BLOCKED, message, command, BuiltInReasons.DM);
             return true;
         }
 
@@ -255,12 +253,8 @@ class SlashCommandHandler extends AkairoHandler {
             ? await this.inhibitorHandler.test('post', message, command)
             : null;
 
-        if (await this.runPermissionChecks(message, command)) {
-            return true;
-        }
-
         if (reason != null) {
-            this.emit(event, message, command, reason);
+            this.emit(CommandHandlerEvents.COMMAND_BLOCKED, message, command, reason);
             return true;
         }
 
