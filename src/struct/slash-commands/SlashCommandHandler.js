@@ -15,7 +15,8 @@ class SlashCommandHandler extends AkairoHandler {
         extensions = ['.js', '.ts'],
         automateCategories,
         loadFilter,
-        ignorePermissions = []
+        ignorePermissions = [],
+        skipBuiltInPostInhibitors = false
     } = {}) {
         if (!(classToHandle.prototype instanceof SlashCommand || classToHandle === SlashCommand)) {
             throw new AkairoError('INVALID_CLASS_TO_HANDLE', classToHandle.name, SlashCommand.name);
@@ -36,7 +37,7 @@ class SlashCommandHandler extends AkairoHandler {
         this.resolver = new TypeResolver(this);
 
         /**
-         * Collecion of command names.
+         * Collection of command names.
          * @type {Collection<string, string>}
          */
         this.names = new Collection();
@@ -52,6 +53,12 @@ class SlashCommandHandler extends AkairoHandler {
          * @type {?InhibitorHandler}
          */
         this.inhibitorHandler = null;
+
+        /**
+         * Whether to skip build in post inhibitors;
+         * @type {boolean}
+         */
+        this.skipBuiltInPostInhibitors = Boolean(skipBuiltInPostInhibitors);
 
         /**
          * Directory to commands.
@@ -194,6 +201,8 @@ class SlashCommandHandler extends AkairoHandler {
 
         if (reason != null) {
             this.emit(CommandHandlerEvents.MESSAGE_BLOCKED, message, reason);
+        } else if (!message.author) {
+            this.emit(CommandHandlerEvents.MESSAGE_BLOCKED, message, BuiltInReasons.AUTHOR_NOT_FOUND);
         } else {
             return false;
         }
@@ -227,34 +236,46 @@ class SlashCommandHandler extends AkairoHandler {
      * @returns {Promise<boolean>}
      */
     async runPostTypeInhibitors(message, command) {
-        if (command.ownerOnly) {
-            const isOwner = this.client.isOwner(message.author);
-            if (!isOwner) {
-                this.emit(CommandHandlerEvents.COMMAND_BLOCKED, message, command, BuiltInReasons.OWNER);
+        const event = CommandHandlerEvents.COMMAND_BLOCKED;
+
+        if (!this.skipBuiltInPostInhibitors) {
+            if (command.ownerOnly) {
+                const isOwner = this.client.isOwner(message.author);
+                if (!isOwner) {
+                    this.emit(event, message, command, BuiltInReasons.OWNER);
+                    return true;
+                }
+            }
+
+            if (command.channel === 'guild' && !message.guild) {
+                this.emit(event, message, command, BuiltInReasons.GUILD);
+                return true;
+            }
+
+            if (command.channel === 'dm' && message.guild) {
+                this.emit(event, message, command, BuiltInReasons.DM);
                 return true;
             }
         }
 
-        if (command.channel === 'guild' && !message.guild) {
-            this.emit(CommandHandlerEvents.COMMAND_BLOCKED, message, command, BuiltInReasons.GUILD);
-            return true;
-        }
-
-        if (command.channel === 'dm' && message.guild) {
-            this.emit(CommandHandlerEvents.COMMAND_BLOCKED, message, command, BuiltInReasons.DM);
-            return true;
-        }
-
-        if (await this.runPermissionChecks(message, command)) {
-            return true;
+        if (!this.skipBuiltInPostInhibitors) {
+            if (await this.runPermissionChecks(message, command)) {
+                return true;
+            }
         }
 
         const reason = this.inhibitorHandler
             ? await this.inhibitorHandler.test('post', message, command)
             : null;
 
+        if (this.skipBuiltInPostInhibitors && reason == null) {
+            if (await this.runPermissionChecks(message, command)) {
+                return true;
+            }
+        }
+
         if (reason != null) {
-            this.emit(CommandHandlerEvents.COMMAND_BLOCKED, message, command, reason);
+            this.emit(event, message, command, reason);
             return true;
         }
 
@@ -268,19 +289,24 @@ class SlashCommandHandler extends AkairoHandler {
      * @returns {Promise<boolean>}
      */
     async runPermissionChecks(message, command) {
+        const event = CommandHandlerEvents.MISSING_PERMISSIONS;
+
         if (command.clientPermissions) {
             if (typeof command.clientPermissions === 'function') {
                 let missing = command.clientPermissions(message);
                 if (isPromise(missing)) missing = await missing;
 
                 if (missing != null) {
-                    this.emit(CommandHandlerEvents.MISSING_PERMISSIONS, message, command, 'client', missing);
+                    this.emit(event, message, command, 'client', missing);
                     return true;
                 }
             } else if (message.guild) {
-                const missing = message.channel.permissionsFor(this.client.user).missing(command.clientPermissions);
+                if (message.channel.type === 'DM') return false;
+                const missing = message.channel
+                    .permissionsFor(message.guild.me)
+                    .missing(command.clientPermissions);
                 if (missing.length) {
-                    this.emit(CommandHandlerEvents.MISSING_PERMISSIONS, message, command, 'client', missing);
+                    this.emit(event, message, command, 'client', missing);
                     return true;
                 }
             }
@@ -300,13 +326,16 @@ class SlashCommandHandler extends AkairoHandler {
                     if (isPromise(missing)) missing = await missing;
 
                     if (missing != null) {
-                        this.emit(CommandHandlerEvents.MISSING_PERMISSIONS, message, command, 'user', missing);
+                        this.emit(event, message, command, 'user', missing);
                         return true;
                     }
                 } else if (message.guild) {
-                    const missing = message.channel.permissionsFor(message.author).missing(command.userPermissions);
+                    if (message.channel.type === 'DM') return false;
+                    const missing = message.channel
+                        .permissionsFor(message.author)
+                        .missing(command.userPermissions);
                     if (missing.length) {
-                        this.emit(CommandHandlerEvents.MISSING_PERMISSIONS, message, command, 'user', missing);
+                        this.emit(event, message, command, 'user', missing);
                         return true;
                     }
                 }
