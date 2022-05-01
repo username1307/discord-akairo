@@ -120,7 +120,7 @@ class SlashCommandHandler extends AkairoHandler {
 
         if (!commandModule) {
             this.emit(CommandHandlerEvents.COMMAND_NOT_FOUND, interaction);
-            return null;
+            return false;
         }
 
         const message = new AkairoMessage(this.client, interaction, commandName);
@@ -254,7 +254,6 @@ class SlashCommandHandler extends AkairoHandler {
         const reason = this.inhibitorHandler
             ? await this.inhibitorHandler.test('post', message, command)
             : null;
-
 
         if (await this.runPermissionChecks(message, command)) {
             return true;
