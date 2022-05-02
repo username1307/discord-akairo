@@ -15,6 +15,10 @@ module.exports = {
     Argument: require('./struct/commands/arguments/Argument'),
     TypeResolver: require('./struct/commands/arguments/TypeResolver'),
 
+    // Slash Commands
+    SlashCommand: require('./struct/slash-commands/SlashCommand'),
+    SlashCommandHandler: require('./struct/slash-commands/SlashCommandHandler'),
+
     // Inhibitors
     Inhibitor: require('./struct/inhibitors/Inhibitor'),
     InhibitorHandler: require('./struct/inhibitors/InhibitorHandler'),
@@ -31,6 +35,7 @@ module.exports = {
 
     // Utilities
     AkairoError: require('./util/AkairoError'),
+    AkairoMessage: require('./util/AkairoMessage'),
     Category: require('./util/Category'),
     Constants: require('./util/Constants'),
     Util: require('./util/Util'),

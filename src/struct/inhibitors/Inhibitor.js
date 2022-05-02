@@ -53,7 +53,7 @@ class Inhibitor extends AkairoModule {
      * If returning a Promise, a resolved value of true will block the message.
      * @abstract
      * @param {Message} message - Message being handled.
-     * @param {Command} [command] - Command to check.
+     * @param {Command | SlashCommand} [command] - Command to check.
      * @returns {boolean|Promise<boolean>}
      */
     exec() {

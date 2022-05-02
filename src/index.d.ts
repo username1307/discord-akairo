@@ -1,12 +1,33 @@
 declare module 'discord-akairo' {
     import {
-        BufferResolvable, Client, ClientOptions, Collection,
-        Message, MessageAttachment, MessageEmbed,
-        MessageEditOptions, MessageOptions, MessagePayload,
-        User, UserResolvable, GuildMember,
-        Channel, Role, Emoji, Guild, ReplyMessageOptions,
-        PermissionResolvable, Snowflake
-    } from 'discord.js';
+    BufferResolvable,
+    Client,
+    ClientOptions,
+    Collection,
+    Message,
+    MessageAttachment,
+    MessageEmbed,
+    MessageEditOptions,
+    MessageOptions,
+    MessagePayload,
+    User,
+    UserResolvable,
+    GuildMember,
+    Channel,
+    Role,
+    Emoji,
+    Guild,
+    ReplyMessageOptions,
+    PermissionResolvable,
+    Snowflake,
+    CommandInteraction,
+    AutocompleteInteraction,
+    ApplicationCommandSubGroupData,
+    ApplicationCommandSubCommandData,
+    ApplicationCommandChoicesData,
+    ApplicationCommandAutocompleteOption,
+    ApplicationCommandNumericOptionData, ApplicationCommandNonOptionsData, ApplicationCommandChannelOptionData
+} from 'discord.js';
 
     import { EventEmitter } from 'events';
     import { Stream } from 'stream';
@@ -70,6 +91,21 @@ declare module 'discord-akairo' {
 
         public reload(): this;
         public remove(): this;
+    }
+
+    export class AkairoMessage {
+        public constructor(client: AkairoClient, interaction: CommandInteraction);
+
+        public author: User;
+        public applicationId: Snowflake;
+        public channelId: Snowflake | null;
+        public content: string;
+        public createdTimestamp: number;
+        public guildId: Snowflake | null;
+        public id: Snowflake;
+        public interaction: CommandInteraction;
+        public member: GuildMember | null;
+        public readonly partial: false;
     }
 
     export class Argument {
@@ -301,6 +337,80 @@ declare module 'discord-akairo' {
         public static is(value: any, type: string): value is Flag;
     }
 
+    export class SlashCommand extends AkairoModule {
+        public constructor(id: string, options?: SlashCommandOptions);
+
+        public category: Category<string, Command>;
+        public channel?: string;
+        public client: AkairoClient;
+        public clientPermissions: PermissionResolvable | PermissionResolvable[] | MissingPermissionSupplier;
+        public commandType: 'command' | 'group' | 'sub';
+        public description: string | any;
+        public filepath: string;
+        public handler: CommandHandler;
+        public id: string;
+        public ignorePermissions?: Snowflake | Snowflake[] | IgnoreCheckPredicate;
+        public name: string;
+        public ownerOnly: boolean;
+        public parentCommandName?: string;
+        public prefixId?: string;
+        public shortCommandName?: string;
+        public userPermissions: PermissionResolvable | PermissionResolvable[] | MissingPermissionSupplier;
+
+        public exec(interaction: CommandInteraction): any;
+        public autocomplete(interaction: AutocompleteInteraction): any;
+        public reload(): this;
+        public remove(): this;
+    }
+
+    export class SlashCommandHandler extends AkairoHandler {
+        public constructor(client: AkairoClient, options: SlashCommandHandlerOptions);
+
+        public categories: Collection<string, Category<string, SlashCommand>>;
+        public classToHandle: typeof SlashCommand;
+        public client: AkairoClient;
+        public directory: string;
+        public ignorePermissions: Snowflake | Snowflake[] | IgnoreCheckPredicate;
+        public inhibitorHandler?: InhibitorHandler;
+        public modules: Collection<string, SlashCommand>;
+        public names: Collection<string, string>;
+
+        public add(filename: string): SlashCommand;
+        public deregister(command: SlashCommand): void;
+        public emitError(err: Error, message: AkairoMessage, command?: SlashCommand): void;
+        public findCategory(name: string): Category<string, SlashCommand>;
+        public findCommand(name: string): SlashCommand;
+        public getCommandName(interaction: CommandInteraction | AutocompleteInteraction): string;
+        public handle(interaction: CommandInteraction): Promise<boolean | null>;
+        public handleAutocomplete(interaction: AutocompleteInteraction): void;
+
+        public load(thing: string | Function, isReload?: boolean): SlashCommand;
+        public loadAll(directory?: string, filter?: LoadPredicate): this;
+        public register(command: SlashCommand, filepath?: string): void;
+        public reload(id: string): SlashCommand;
+        public reloadAll(): this;
+        public remove(id: string): SlashCommand;
+        public removeAll(): this;
+        public runAllTypeInhibitors(message: AkairoMessage): Promise<boolean>;
+        public runPermissionChecks(message: AkairoMessage, command: SlashCommand): Promise<boolean>;
+        public runPreTypeInhibitors(message: AkairoMessage): Promise<boolean>;
+        public runPostTypeInhibitors(message: AkairoMessage, command: SlashCommand): Promise<boolean>;
+        public runCommand(message: AkairoMessage, command: SlashCommand, args: any): Promise<void>;
+        public useInhibitorHandler(inhibitorHandler: InhibitorHandler): this;
+        public useListenerHandler(ListenerHandler: ListenerHandler): this;
+        public on(event: 'remove', listener: (command: SlashCommand) => any): this;
+        public on(event: 'load', listener: (command: SlashCommand, isReload: boolean) => any): this;
+        public on(event: 'commandBlocked', listener: (message: AkairoMessage, command: SlashCommand, reason: string) => any): this;
+        public on(event: 'commandBreakout', listener: (message: AkairoMessage, command: SlashCommand, breakMessage: Message) => any): this;
+        public on(event: 'commandCancelled', listener: (message: AkairoMessage, command: SlashCommand, retryMessage?: Message) => any): this;
+        public on(event: 'commandFinished', listener: (message: AkairoMessage, command: SlashCommand, args: any, returnValue: any) => any): this;
+        public on(event: 'commandLocked', listener: (message: AkairoMessage, command: SlashCommand) => any): this;
+        public on(event: 'commandStarted', listener: (message: AkairoMessage, command: SlashCommand, args: any) => any): this;
+        public on(event: 'error', listener: (error: Error, message: AkairoMessage, command?: SlashCommand) => any): this;
+        public on(event: 'commandNotFound', listener: (interaction: CommandInteraction) => any): this;
+        public on(event: 'missingPermissions', listener: (message: AkairoMessage, command: SlashCommand, type: 'client' | 'user', missing?: any) => any): this;
+    }
+
     export class Inhibitor extends AkairoModule {
         public constructor(id: string, options?: InhibitorOptions);
 
@@ -312,7 +422,7 @@ declare module 'discord-akairo' {
         public reason: string;
         public type: string;
 
-        public exec(message: Message, command?: Command): boolean | Promise<boolean>;
+        public exec(message: Message, command?: Command | SlashCommand): boolean | Promise<boolean>;
         public reload(): this;
         public remove(): this;
     }
@@ -335,7 +445,7 @@ declare module 'discord-akairo' {
         public reloadAll(): this;
         public remove(id: string): Inhibitor;
         public removeAll(): this;
-        public test(type: 'all' | 'pre' | 'post', message: Message, command?: Command): Promise<string | void>;
+        public test(type: 'all' | 'pre' | 'post', message: Message | AkairoMessage, command?: Command | SlashCommand): Promise<string | void>;
         public on(event: 'remove', listener: (inhibitor: Inhibitor) => any): this;
         public on(event: 'load', listener: (inhibitor: Inhibitor, isReload: boolean) => any): this;
     }
@@ -457,6 +567,54 @@ declare module 'discord-akairo' {
         public static isEventEmitter(value: any): boolean;
         public static isPromise(value: any): boolean;
     }
+
+    export interface AkairoApplicationCommandSubGroupData
+        extends ApplicationCommandSubGroupData {
+        options?: AkairoApplicationCommandSubCommandData[];
+    }
+
+    export interface AkairoApplicationCommandSubCommandData
+        extends ApplicationCommandSubCommandData {
+        options?: (
+            | AkairoApplicationCommandChoicesData
+            | AkairoApplicationCommandNonOptionsData
+            | AkairoApplicationCommandChannelOptionData
+            )[];
+    }
+
+    export interface AkairoApplicationCommandChoicesData
+        extends ApplicationCommandChoicesData {
+        resolve?: SlashResolveTypes;
+    }
+
+    export interface AkairoApplicationCommandAutocompleteOption
+        extends ApplicationCommandAutocompleteOption {
+        resolve?: SlashResolveTypes;
+    }
+
+    export interface AkairoApplicationCommandNumericOptionData
+        extends ApplicationCommandNumericOptionData {
+        resolve?: SlashResolveTypes;
+    }
+
+    export interface AkairoApplicationCommandNonOptionsData
+        extends ApplicationCommandNonOptionsData {
+        resolve?: SlashResolveTypes;
+    }
+
+    export interface AkairoApplicationCommandChannelOptionData
+        extends ApplicationCommandChannelOptionData {
+        resolve?: SlashResolveTypes;
+    }
+
+    export type AkairoApplicationCommandOptionData =
+        | AkairoApplicationCommandSubGroupData
+        | AkairoApplicationCommandNonOptionsData
+        | AkairoApplicationCommandChannelOptionData
+        | AkairoApplicationCommandChoicesData
+        | AkairoApplicationCommandAutocompleteOption
+        | AkairoApplicationCommandNumericOptionData
+        | AkairoApplicationCommandSubCommandData;
 
     export interface AkairoHandlerOptions {
         automateCategories?: boolean;
@@ -618,6 +776,25 @@ declare module 'discord-akairo' {
         idColumn?: string;
     }
 
+    export interface SlashCommandOptions extends AkairoModuleOptions {
+        args?: SlashOption[];
+        channel?: 'guild' | 'dm';
+        clientPermissions?: PermissionResolvable | PermissionResolvable[] | MissingPermissionSupplier;
+        commandType: 'command' | 'group' | 'sub';
+        description?: string | any;
+        ignorePermissions?: Snowflake | Snowflake[] | IgnoreCheckPredicate;
+        name: string;
+        ownerOnly?: boolean;
+        parentCommandName?: string;
+        prefixId?: string;
+        shortCommandName?: string;
+        userPermissions?: PermissionResolvable | PermissionResolvable[] | MissingPermissionSupplier;
+    }
+
+    export interface SlashCommandHandlerOptions extends AkairoHandlerOptions {
+        ignorePermissions?: Snowflake | Snowflake[] | IgnoreCheckPredicate;
+    }
+
     export type StringData = {
         type: 'Phrase';
         value: string;
@@ -685,6 +862,22 @@ declare module 'discord-akairo' {
         => string | MessageOptions | Promise<string | MessageOptions>;
 
     export type RegexSupplier = (message: Message) => RegExp;
+
+    export type SlashOption = AkairoApplicationCommandOptionData & {
+        resolve?: SlashResolveTypes;
+    };
+
+    export type SlashResolveTypes =
+        | 'boolean'
+        | 'channel'
+        | 'string'
+        | 'integer'
+        | 'number'
+        | 'user'
+        | 'member'
+        | 'role'
+        | 'mentionable'
+        | 'message';
 
     export const Constants: {
         ArgumentMatches: {
@@ -769,6 +962,7 @@ declare module 'discord-akairo' {
             OWNER: 'owner';
             GUILD: 'guild';
             DM: 'dm';
+            AUTHOR_NOT_FOUND: 'authorNotFound';
         };
     };
 
