@@ -10,6 +10,7 @@ class SlashCommand extends AkairoModule {
             channel = null,
             commandType,
             name = '',
+            prefixId = null,
             parentCommandName,
             shortCommandName = '',
             ownerOnly = false,
@@ -54,6 +55,12 @@ class SlashCommand extends AkairoModule {
          * @type {string}
          */
         this.name = name;
+
+        /**
+         * The name of a corresponding prefix command id.
+         * @type {?string}
+         */
+        this.prefixId = prefixId;
 
         /**
          * Usable only by the client owner.

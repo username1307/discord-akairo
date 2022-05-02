@@ -353,6 +353,7 @@ declare module 'discord-akairo' {
         public name: string;
         public ownerOnly: boolean;
         public parentCommandName?: string;
+        public prefixId?: string;
         public shortCommandName?: string;
         public userPermissions: PermissionResolvable | PermissionResolvable[] | MissingPermissionSupplier;
 
@@ -785,6 +786,7 @@ declare module 'discord-akairo' {
         name: string;
         ownerOnly?: boolean;
         parentCommandName?: string;
+        prefixId?: string;
         shortCommandName?: string;
         userPermissions?: PermissionResolvable | PermissionResolvable[] | MissingPermissionSupplier;
     }
@@ -960,6 +962,7 @@ declare module 'discord-akairo' {
             OWNER: 'owner';
             GUILD: 'guild';
             DM: 'dm';
+            AUTHOR_NOT_FOUND: 'authorNotFound';
         };
     };
 
