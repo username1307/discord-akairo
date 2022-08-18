@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -30,7 +21,7 @@ class MessageCommandHandler extends AkairoHandler_js_1.default {
      * @param options - Options.
      */
     constructor(client, options) {
-        const { directory, classToHandle = MessageCommand_1.default, extensions = ['.js', '.ts'], automateCategories, loadFilter, blockClient = true, blockBots = true, fetchMembers = false, handleEdits = false, storeMessages = false, commandUtil, commandUtilLifetime = 3e5, commandUtilSweepInterval = 3e5, defaultCooldown = 0, ignoreCooldown = client.ownerID, ignorePermissions = [], argumentDefaults = {}, prefix = '!', allowMention = true, aliasReplacement, typing = false, skipBuiltInPostInhibitors = false, } = options !== null && options !== void 0 ? options : {};
+        const { directory, classToHandle = MessageCommand_1.default, extensions = ['.js', '.ts'], automateCategories, loadFilter, blockClient = true, blockBots = true, fetchMembers = false, handleEdits = false, storeMessages = false, commandUtil, commandUtilLifetime = 3e5, commandUtilSweepInterval = 3e5, defaultCooldown = 0, ignoreCooldown = client.ownerID, ignorePermissions = [], argumentDefaults = {}, prefix = '!', allowMention = true, aliasReplacement, typing = false, skipBuiltInPostInhibitors = false, } = options ?? {};
         if (!(classToHandle.prototype instanceof MessageCommand_1.default ||
             classToHandle === MessageCommand_1.default)) {
             throw new AkairoError_js_1.default('INVALID_CLASS_TO_HANDLE', classToHandle.name, MessageCommand_1.default.name);
@@ -102,22 +93,22 @@ class MessageCommandHandler extends AkairoHandler_js_1.default {
      */
     setup() {
         this.client.once('ready', () => {
-            this.client.on('messageCreate', (m) => __awaiter(this, void 0, void 0, function* () {
+            this.client.on('messageCreate', async (m) => {
                 if (m.partial)
-                    yield m.fetch();
+                    await m.fetch();
                 this.handle(m);
-            }));
+            });
             if (this.handleEdits) {
-                this.client.on('messageUpdate', (o, m) => __awaiter(this, void 0, void 0, function* () {
+                this.client.on('messageUpdate', async (o, m) => {
                     if (o.partial)
-                        yield o.fetch();
+                        await o.fetch();
                     if (m.partial)
-                        yield m.fetch();
+                        await m.fetch();
                     if (o.content === m.content)
                         return;
                     if (this.handleEdits)
                         this.handle(m);
-                }));
+                });
             }
         });
         if (this.commandUtil)
@@ -197,21 +188,21 @@ class MessageCommandHandler extends AkairoHandler_js_1.default {
             if (Array.isArray(command.prefix)) {
                 for (const prefix of command.prefix) {
                     const prefixes = this.prefixes.get(prefix);
-                    if ((prefixes === null || prefixes === void 0 ? void 0 : prefixes.size) === 1) {
+                    if (prefixes?.size === 1) {
                         this.prefixes.delete(prefix);
                     }
                     else {
-                        prefixes === null || prefixes === void 0 ? void 0 : prefixes.delete(prefix);
+                        prefixes?.delete(prefix);
                     }
                 }
             }
             else {
                 const prefixes = this.prefixes.get(command.prefix);
-                if ((prefixes === null || prefixes === void 0 ? void 0 : prefixes.size) === 1) {
+                if (prefixes?.size === 1) {
                     this.prefixes.delete(command.prefix);
                 }
                 else {
-                    prefixes === null || prefixes === void 0 ? void 0 : prefixes.delete(command.prefix);
+                    prefixes?.delete(command.prefix);
                 }
             }
         }
@@ -221,59 +212,57 @@ class MessageCommandHandler extends AkairoHandler_js_1.default {
      * Handles a message.
      * @param message - Message to handle.
      */
-    handle(message) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                if (this.fetchMembers &&
-                    message.guild &&
-                    !message.member &&
-                    !message.webhookId) {
-                    yield message.guild.members.fetch(message.author);
-                }
-                if (yield this.runAllTypeInhibitors(message)) {
-                    return false;
-                }
-                if (this.commandUtil) {
-                    if (this.commandUtils.has(message.id)) {
-                        message.util = this.commandUtils.get(message.id);
-                    }
-                    else {
-                        message.util = new MessageCommandUtil_1.default(this, message);
-                        this.commandUtils.set(message.id, message.util);
-                    }
-                }
-                if (yield this.runPreTypeInhibitors(message)) {
-                    return false;
-                }
-                let parsed = yield this.parseCommand(message);
-                if (!parsed.command) {
-                    const overParsed = yield this.parseCommandOverwrittenPrefixes(message);
-                    if (overParsed.command ||
-                        (parsed.prefix == null && overParsed.prefix != null)) {
-                        parsed = overParsed;
-                    }
-                }
-                if (this.commandUtil) {
-                    message.util.parsed = parsed;
-                }
-                let ran;
-                if (!parsed.command) {
-                    ran = yield this.handleRegexAndConditionalCommands(message);
+    async handle(message) {
+        try {
+            if (this.fetchMembers &&
+                message.guild &&
+                !message.member &&
+                !message.webhookId) {
+                await message.guild.members.fetch(message.author);
+            }
+            if (await this.runAllTypeInhibitors(message)) {
+                return false;
+            }
+            if (this.commandUtil) {
+                if (this.commandUtils.has(message.id)) {
+                    message.util = this.commandUtils.get(message.id);
                 }
                 else {
-                    ran = yield this.handleDirectCommand(message, parsed.content, parsed.command);
+                    message.util = new MessageCommandUtil_1.default(this, message);
+                    this.commandUtils.set(message.id, message.util);
                 }
-                if (ran === false) {
-                    this.emit(Constants_js_1.CommandHandlerEvents.MESSAGE_INVALID, message);
-                    return false;
+            }
+            if (await this.runPreTypeInhibitors(message)) {
+                return false;
+            }
+            let parsed = await this.parseCommand(message);
+            if (!parsed.command) {
+                const overParsed = await this.parseCommandOverwrittenPrefixes(message);
+                if (overParsed.command ||
+                    (parsed.prefix == null && overParsed.prefix != null)) {
+                    parsed = overParsed;
                 }
-                return ran;
             }
-            catch (err) {
-                this.emitError(err, message);
-                return null;
+            if (this.commandUtil) {
+                message.util.parsed = parsed;
             }
-        });
+            let ran;
+            if (!parsed.command) {
+                ran = await this.handleRegexAndConditionalCommands(message);
+            }
+            else {
+                ran = await this.handleDirectCommand(message, parsed.content, parsed.command);
+            }
+            if (ran === false) {
+                this.emit(Constants_js_1.CommandHandlerEvents.MESSAGE_INVALID, message);
+                return false;
+            }
+            return ran;
+        }
+        catch (err) {
+            this.emitError(err, message);
+            return null;
+        }
     }
     /**
      * Handles normal messageCommands.
@@ -282,220 +271,206 @@ class MessageCommandHandler extends AkairoHandler_js_1.default {
      * @param command - MessageCommand instance.
      * @param ignore - Ignore inhibitors and other checks.
      */
-    handleDirectCommand(message, content, command, ignore = false) {
-        var _a, _b, _c;
-        return __awaiter(this, void 0, void 0, function* () {
-            let key;
-            try {
-                if (!ignore) {
-                    if (message.editedTimestamp && !command.editable)
-                        return false;
-                    if (yield this.runPostTypeInhibitors(message, command))
-                        return false;
-                }
-                const before = command.before(message);
-                if (Util_js_1.default.isPromise(before))
-                    yield before;
-                const args = yield command.parse(message, content);
-                if (Flag_js_1.default.is(args, 'cancel')) {
-                    this.emit(Constants_js_1.CommandHandlerEvents.COMMAND_CANCELLED, message, command);
-                    return true;
-                }
-                else if (Flag_js_1.default.is(args, 'retry')) {
-                    this.emit(Constants_js_1.CommandHandlerEvents.COMMAND_BREAKOUT, message, command, args.message);
-                    return this.handle(args.message);
-                }
-                else if (Flag_js_1.default.is(args, 'continue')) {
-                    const continueCommand = this.modules.get(args.command);
-                    return this.handleDirectCommand(message, args.rest, continueCommand, args.ignore);
-                }
-                if (!ignore) {
-                    if (command.lock)
-                        key = command.lock(message, args);
-                    if (Util_js_1.default.isPromise(key))
-                        key = yield key;
-                    if (key) {
-                        if ((_a = command.locker) === null || _a === void 0 ? void 0 : _a.has(key)) {
-                            key = null;
-                            this.emit(Constants_js_1.CommandHandlerEvents.COMMAND_LOCKED, message, command);
-                            return true;
-                        }
-                        (_b = command.locker) === null || _b === void 0 ? void 0 : _b.add(key);
-                    }
-                }
-                yield this.runCommand(message, command, args);
+    async handleDirectCommand(message, content, command, ignore = false) {
+        let key;
+        try {
+            if (!ignore) {
+                if (message.editedTimestamp && !command.editable)
+                    return false;
+                if (await this.runPostTypeInhibitors(message, command))
+                    return false;
+            }
+            const before = command.before(message);
+            if (Util_js_1.default.isPromise(before))
+                await before;
+            const args = await command.parse(message, content);
+            if (Flag_js_1.default.is(args, 'cancel')) {
+                this.emit(Constants_js_1.CommandHandlerEvents.COMMAND_CANCELLED, message, command);
                 return true;
             }
-            catch (err) {
-                this.emitError(err, message, command);
-                return null;
+            else if (Flag_js_1.default.is(args, 'retry')) {
+                this.emit(Constants_js_1.CommandHandlerEvents.COMMAND_BREAKOUT, message, command, args.message);
+                return this.handle(args.message);
             }
-            finally {
-                if (key)
-                    (_c = command.locker) === null || _c === void 0 ? void 0 : _c.delete(key);
+            else if (Flag_js_1.default.is(args, 'continue')) {
+                const continueCommand = this.modules.get(args.command);
+                return this.handleDirectCommand(message, args.rest, continueCommand, args.ignore);
             }
-        });
+            if (!ignore) {
+                if (command.lock)
+                    key = command.lock(message, args);
+                if (Util_js_1.default.isPromise(key))
+                    key = await key;
+                if (key) {
+                    if (command.locker?.has(key)) {
+                        key = null;
+                        this.emit(Constants_js_1.CommandHandlerEvents.COMMAND_LOCKED, message, command);
+                        return true;
+                    }
+                    command.locker?.add(key);
+                }
+            }
+            await this.runCommand(message, command, args);
+            return true;
+        }
+        catch (err) {
+            this.emitError(err, message, command);
+            return null;
+        }
+        finally {
+            if (key)
+                command.locker?.delete(key);
+        }
     }
     /**
      * Handles regex and conditional messageCommands.
      * @param message - Message to handle.
      */
-    handleRegexAndConditionalCommands(message) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const ran1 = yield this.handleRegexCommands(message);
-            const ran2 = yield this.handleConditionalCommands(message);
-            return ran1 || ran2;
-        });
+    async handleRegexAndConditionalCommands(message) {
+        const ran1 = await this.handleRegexCommands(message);
+        const ran2 = await this.handleConditionalCommands(message);
+        return ran1 || ran2;
     }
     /**
      * Handles regex messageCommands.
      * @param message - Message to handle.
      */
-    handleRegexCommands(message) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const hasRegexCommands = [];
-            for (const command of this.modules.values()) {
-                if (message.editedTimestamp ? command.editable : true) {
-                    const regex = typeof command.regex === 'function'
-                        ? command.regex(message)
-                        : command.regex;
-                    if (regex)
-                        hasRegexCommands.push({ command, regex });
+    async handleRegexCommands(message) {
+        const hasRegexCommands = [];
+        for (const command of this.modules.values()) {
+            if (message.editedTimestamp ? command.editable : true) {
+                const regex = typeof command.regex === 'function'
+                    ? command.regex(message)
+                    : command.regex;
+                if (regex)
+                    hasRegexCommands.push({ command, regex });
+            }
+        }
+        const matchedCommands = [];
+        for (const entry of hasRegexCommands) {
+            const match = message.content.match(entry.regex);
+            if (!match)
+                continue;
+            const matches = [];
+            if (entry.regex.global) {
+                let matched;
+                while ((matched = entry.regex.exec(message.content)) != null) {
+                    matches.push(matched);
                 }
             }
-            const matchedCommands = [];
-            for (const entry of hasRegexCommands) {
-                const match = message.content.match(entry.regex);
-                if (!match)
-                    continue;
-                const matches = [];
-                if (entry.regex.global) {
-                    let matched;
-                    while ((matched = entry.regex.exec(message.content)) != null) {
-                        matches.push(matched);
-                    }
+            matchedCommands.push({ command: entry.command, match, matches });
+        }
+        if (!matchedCommands.length) {
+            return false;
+        }
+        const promises = [];
+        for (const { command, match, matches } of matchedCommands) {
+            promises.push((async () => {
+                try {
+                    if (await this.runPostTypeInhibitors(message, command))
+                        return;
+                    const before = command.before(message);
+                    if (Util_js_1.default.isPromise(before))
+                        await before;
+                    await this.runCommand(message, command, {
+                        match,
+                        matches,
+                    });
                 }
-                matchedCommands.push({ command: entry.command, match, matches });
-            }
-            if (!matchedCommands.length) {
-                return false;
-            }
-            const promises = [];
-            for (const { command, match, matches } of matchedCommands) {
-                promises.push((() => __awaiter(this, void 0, void 0, function* () {
-                    try {
-                        if (yield this.runPostTypeInhibitors(message, command))
-                            return;
-                        const before = command.before(message);
-                        if (Util_js_1.default.isPromise(before))
-                            yield before;
-                        yield this.runCommand(message, command, {
-                            match,
-                            matches,
-                        });
-                    }
-                    catch (err) {
-                        this.emitError(err, message, command);
-                    }
-                }))());
-            }
-            yield Promise.all(promises);
-            return true;
-        });
+                catch (err) {
+                    this.emitError(err, message, command);
+                }
+            })());
+        }
+        await Promise.all(promises);
+        return true;
     }
     /**
      * Handles conditional messageCommands.
      * @param message - Message to handle.
      */
-    handleConditionalCommands(message) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const trueCommands = [];
-            const filterPromises = [];
-            for (const command of this.modules.values()) {
-                if (message.editedTimestamp && !command.editable)
-                    continue;
-                filterPromises.push((() => __awaiter(this, void 0, void 0, function* () {
-                    let cond = command.condition(message);
-                    if (Util_js_1.default.isPromise(cond))
-                        cond = yield cond;
-                    if (cond)
-                        trueCommands.push(command);
-                }))());
-            }
-            yield Promise.all(filterPromises);
-            if (!trueCommands.length) {
-                return false;
-            }
-            const promises = [];
-            for (const command of trueCommands) {
-                promises.push((() => __awaiter(this, void 0, void 0, function* () {
-                    try {
-                        if (yield this.runPostTypeInhibitors(message, command))
-                            return;
-                        const before = command.before(message);
-                        if (Util_js_1.default.isPromise(before))
-                            yield before;
-                        yield this.runCommand(message, command, {});
-                    }
-                    catch (err) {
-                        this.emitError(err, message, command);
-                    }
-                }))());
-            }
-            yield Promise.all(promises);
-            return true;
-        });
+    async handleConditionalCommands(message) {
+        const trueCommands = [];
+        const filterPromises = [];
+        for (const command of this.modules.values()) {
+            if (message.editedTimestamp && !command.editable)
+                continue;
+            filterPromises.push((async () => {
+                let cond = command.condition(message);
+                if (Util_js_1.default.isPromise(cond))
+                    cond = await cond;
+                if (cond)
+                    trueCommands.push(command);
+            })());
+        }
+        await Promise.all(filterPromises);
+        if (!trueCommands.length) {
+            return false;
+        }
+        const promises = [];
+        for (const command of trueCommands) {
+            promises.push((async () => {
+                try {
+                    if (await this.runPostTypeInhibitors(message, command))
+                        return;
+                    const before = command.before(message);
+                    if (Util_js_1.default.isPromise(before))
+                        await before;
+                    await this.runCommand(message, command, {});
+                }
+                catch (err) {
+                    this.emitError(err, message, command);
+                }
+            })());
+        }
+        await Promise.all(promises);
+        return true;
     }
     /**
      * Runs inhibitors with the all type.
      * @param message - Message to handle.
      * @param slash - Whether or not the command should is a slash command.
      */
-    runAllTypeInhibitors(message, slash = false) {
-        var _a;
-        return __awaiter(this, void 0, void 0, function* () {
-            const reason = this.inhibitorHandler
-                ? yield this.inhibitorHandler.test('all', message)
-                : null;
-            if (reason != null) {
-                this.emit(Constants_js_1.CommandHandlerEvents.MESSAGE_BLOCKED, message, reason);
-            }
-            else if (!message.author) {
-                this.emit(Constants_js_1.CommandHandlerEvents.MESSAGE_BLOCKED, message, Constants_js_1.BuiltInReasons.AUTHOR_NOT_FOUND);
-            }
-            else if (this.blockClient &&
-                message.author.id === ((_a = this.client.user) === null || _a === void 0 ? void 0 : _a.id)) {
-                this.emit(Constants_js_1.CommandHandlerEvents.MESSAGE_BLOCKED, message, Constants_js_1.BuiltInReasons.CLIENT);
-            }
-            else if (this.blockBots && message.author.bot) {
-                this.emit(Constants_js_1.CommandHandlerEvents.MESSAGE_BLOCKED, message, Constants_js_1.BuiltInReasons.BOT);
-            }
-            else if (!slash && this.hasPrompt(message.channel, message.author)) {
-                this.emit(Constants_js_1.CommandHandlerEvents.IN_PROMPT, message);
-            }
-            else {
-                return false;
-            }
-            return true;
-        });
+    async runAllTypeInhibitors(message, slash = false) {
+        const reason = this.inhibitorHandler
+            ? await this.inhibitorHandler.test('all', message)
+            : null;
+        if (reason != null) {
+            this.emit(Constants_js_1.CommandHandlerEvents.MESSAGE_BLOCKED, message, reason);
+        }
+        else if (!message.author) {
+            this.emit(Constants_js_1.CommandHandlerEvents.MESSAGE_BLOCKED, message, Constants_js_1.BuiltInReasons.AUTHOR_NOT_FOUND);
+        }
+        else if (this.blockClient &&
+            message.author.id === this.client.user?.id) {
+            this.emit(Constants_js_1.CommandHandlerEvents.MESSAGE_BLOCKED, message, Constants_js_1.BuiltInReasons.CLIENT);
+        }
+        else if (this.blockBots && message.author.bot) {
+            this.emit(Constants_js_1.CommandHandlerEvents.MESSAGE_BLOCKED, message, Constants_js_1.BuiltInReasons.BOT);
+        }
+        else if (!slash && this.hasPrompt(message.channel, message.author)) {
+            this.emit(Constants_js_1.CommandHandlerEvents.IN_PROMPT, message);
+        }
+        else {
+            return false;
+        }
+        return true;
     }
     /**
      * Runs inhibitors with the pre type.
      * @param message - Message to handle.
      */
-    runPreTypeInhibitors(message) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const reason = this.inhibitorHandler
-                ? yield this.inhibitorHandler.test('pre', message)
-                : null;
-            if (reason != null) {
-                this.emit(Constants_js_1.CommandHandlerEvents.MESSAGE_BLOCKED, message, reason);
-            }
-            else {
-                return false;
-            }
-            return true;
-        });
+    async runPreTypeInhibitors(message) {
+        const reason = this.inhibitorHandler
+            ? await this.inhibitorHandler.test('pre', message)
+            : null;
+        if (reason != null) {
+            this.emit(Constants_js_1.CommandHandlerEvents.MESSAGE_BLOCKED, message, reason);
+        }
+        else {
+            return false;
+        }
+        return true;
     }
     /**
      * Runs inhibitors with the post type.
@@ -503,50 +478,48 @@ class MessageCommandHandler extends AkairoHandler_js_1.default {
      * @param command - MessageCommand to handle.
      * @param slash - Whether or not the command should is a slash command.
      */
-    runPostTypeInhibitors(message, command, slash = false) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const event = slash
-                ? Constants_js_1.CommandHandlerEvents.SLASH_BLOCKED
-                : Constants_js_1.CommandHandlerEvents.COMMAND_BLOCKED;
-            if (!this.skipBuiltInPostInhibitors) {
-                if (command.ownerOnly) {
-                    const isOwner = this.client.isOwner(message.author);
-                    if (!isOwner) {
-                        this.emit(event, message, command, Constants_js_1.BuiltInReasons.OWNER);
-                        return true;
-                    }
-                }
-                if (command.channel === 'guild' && !message.guild) {
-                    this.emit(event, message, command, Constants_js_1.BuiltInReasons.GUILD);
-                    return true;
-                }
-                if (command.channel === 'dm' && message.guild) {
-                    this.emit(event, message, command, Constants_js_1.BuiltInReasons.DM);
+    async runPostTypeInhibitors(message, command, slash = false) {
+        const event = slash
+            ? Constants_js_1.CommandHandlerEvents.SLASH_BLOCKED
+            : Constants_js_1.CommandHandlerEvents.COMMAND_BLOCKED;
+        if (!this.skipBuiltInPostInhibitors) {
+            if (command.ownerOnly) {
+                const isOwner = this.client.isOwner(message.author);
+                if (!isOwner) {
+                    this.emit(event, message, command, Constants_js_1.BuiltInReasons.OWNER);
                     return true;
                 }
             }
-            if (!this.skipBuiltInPostInhibitors) {
-                if (yield this.runPermissionChecks(message, command, slash)) {
-                    return true;
-                }
-            }
-            const reason = this.inhibitorHandler
-                ? yield this.inhibitorHandler.test('post', message, command)
-                : null;
-            if (this.skipBuiltInPostInhibitors && reason == null) {
-                if (yield this.runPermissionChecks(message, command, slash)) {
-                    return true;
-                }
-            }
-            if (reason != null) {
-                this.emit(event, message, command, reason);
+            if (command.channel === 'guild' && !message.guild) {
+                this.emit(event, message, command, Constants_js_1.BuiltInReasons.GUILD);
                 return true;
             }
-            if (this.runCooldowns(message, command)) {
+            if (command.channel === 'dm' && message.guild) {
+                this.emit(event, message, command, Constants_js_1.BuiltInReasons.DM);
                 return true;
             }
-            return false;
-        });
+        }
+        if (!this.skipBuiltInPostInhibitors) {
+            if (await this.runPermissionChecks(message, command, slash)) {
+                return true;
+            }
+        }
+        const reason = this.inhibitorHandler
+            ? await this.inhibitorHandler.test('post', message, command)
+            : null;
+        if (this.skipBuiltInPostInhibitors && reason == null) {
+            if (await this.runPermissionChecks(message, command, slash)) {
+                return true;
+            }
+        }
+        if (reason != null) {
+            this.emit(event, message, command, reason);
+            return true;
+        }
+        if (this.runCooldowns(message, command)) {
+            return true;
+        }
+        return false;
     }
     /**
      * Runs permission checks.
@@ -554,62 +527,63 @@ class MessageCommandHandler extends AkairoHandler_js_1.default {
      * @param command - MessageCommand to cooldown.
      * @param slash - Whether the command is a slash command.
      */
-    runPermissionChecks(message, command, slash = false) {
-        var _a, _b, _c, _d, _e, _f;
-        return __awaiter(this, void 0, void 0, function* () {
-            const event = slash
-                ? Constants_js_1.CommandHandlerEvents.SLASH_MISSING_PERMISSIONS
-                : Constants_js_1.CommandHandlerEvents.MISSING_PERMISSIONS;
-            if (command.clientPermissions) {
-                if (typeof command.clientPermissions === 'function') {
-                    let missing = command.clientPermissions(message);
+    async runPermissionChecks(message, command, slash = false) {
+        const event = slash
+            ? Constants_js_1.CommandHandlerEvents.SLASH_MISSING_PERMISSIONS
+            : Constants_js_1.CommandHandlerEvents.MISSING_PERMISSIONS;
+        if (command.clientPermissions) {
+            if (typeof command.clientPermissions === 'function') {
+                let missing = command.clientPermissions(message);
+                if (Util_js_1.default.isPromise(missing))
+                    missing = await missing;
+                if (missing != null) {
+                    this.emit(event, message, command, 'client', missing);
+                    return true;
+                }
+            }
+            else if (message.guild) {
+                if (message.channel?.type === discord_js_1.ChannelType.DM)
+                    return false;
+                const missing = message.channel
+                    ?.permissionsFor(message.guild.members.me)
+                    ?.missing(command.clientPermissions);
+                if (missing?.length) {
+                    this.emit(event, message, command, 'client', missing);
+                    return true;
+                }
+            }
+        }
+        if (command.userPermissions) {
+            const ignorer = command.ignorePermissions || this.ignorePermissions;
+            const isIgnored = Array.isArray(ignorer)
+                ? ignorer.includes(message.author.id)
+                : typeof ignorer === 'function'
+                    ? ignorer(message, command)
+                    : message.author.id === ignorer;
+            if (!isIgnored) {
+                if (typeof command.userPermissions === 'function') {
+                    let missing = command.userPermissions(message);
                     if (Util_js_1.default.isPromise(missing))
-                        missing = yield missing;
+                        missing = await missing;
                     if (missing != null) {
-                        this.emit(event, message, command, 'client', missing);
+                        this.emit(event, message, command, 'user', missing);
                         return true;
                     }
                 }
                 else if (message.guild) {
-                    if (((_a = message.channel) === null || _a === void 0 ? void 0 : _a.type) === discord_js_1.ChannelType.DM)
+                    if (message.channel?.type === discord_js_1.ChannelType.DM)
                         return false;
-                    const missing = (_c = (_b = message.channel) === null || _b === void 0 ? void 0 : _b.permissionsFor(message.guild.members.me)) === null || _c === void 0 ? void 0 : _c.missing(command.clientPermissions);
-                    if (missing === null || missing === void 0 ? void 0 : missing.length) {
-                        this.emit(event, message, command, 'client', missing);
+                    const missing = message.channel
+                        ?.permissionsFor(message.author)
+                        ?.missing(command.userPermissions);
+                    if (missing?.length) {
+                        this.emit(event, message, command, 'user', missing);
                         return true;
                     }
                 }
             }
-            if (command.userPermissions) {
-                const ignorer = command.ignorePermissions || this.ignorePermissions;
-                const isIgnored = Array.isArray(ignorer)
-                    ? ignorer.includes(message.author.id)
-                    : typeof ignorer === 'function'
-                        ? ignorer(message, command)
-                        : message.author.id === ignorer;
-                if (!isIgnored) {
-                    if (typeof command.userPermissions === 'function') {
-                        let missing = command.userPermissions(message);
-                        if (Util_js_1.default.isPromise(missing))
-                            missing = yield missing;
-                        if (missing != null) {
-                            this.emit(event, message, command, 'user', missing);
-                            return true;
-                        }
-                    }
-                    else if (message.guild) {
-                        if (((_d = message.channel) === null || _d === void 0 ? void 0 : _d.type) === discord_js_1.ChannelType.DM)
-                            return false;
-                        const missing = (_f = (_e = message.channel) === null || _e === void 0 ? void 0 : _e.permissionsFor(message.author)) === null || _f === void 0 ? void 0 : _f.missing(command.userPermissions);
-                        if (missing === null || missing === void 0 ? void 0 : missing.length) {
-                            this.emit(event, message, command, 'user', missing);
-                            return true;
-                        }
-                    }
-                }
-            }
-            return false;
-        });
+        }
+        return false;
     }
     /**
      * Runs cooldowns and checks if a user is under cooldown.
@@ -617,8 +591,7 @@ class MessageCommandHandler extends AkairoHandler_js_1.default {
      * @param command - MessageCommand to cooldown.
      */
     runCooldowns(message, command) {
-        var _a;
-        const id = (_a = message.author) === null || _a === void 0 ? void 0 : _a.id;
+        const id = message.author?.id;
         const ignorer = command.ignoreCooldown || this.ignoreCooldown;
         const isIgnored = Array.isArray(ignorer)
             ? ignorer.includes(id)
@@ -664,66 +637,59 @@ class MessageCommandHandler extends AkairoHandler_js_1.default {
      * @param command - MessageCommand to handle.
      * @param args - Arguments to use.
      */
-    runCommand(message, command, args) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!command || !message) {
-                this.emit(Constants_js_1.CommandHandlerEvents.COMMAND_INVALID, message, command);
-                return;
-            }
-            const typing = command.typing || this.typing
-                ? setInterval(() => {
-                    if (command.typing || this.typing)
-                        message.channel.sendTyping();
-                }, 9000)
-                : undefined;
-            try {
-                this.emit(Constants_js_1.CommandHandlerEvents.COMMAND_STARTED, message, command, args);
-                const ret = yield command.exec(message, args);
-                this.emit(Constants_js_1.CommandHandlerEvents.COMMAND_FINISHED, message, command, args, ret);
-            }
-            finally {
-                if (typing)
-                    clearInterval(typing);
-            }
-        });
+    async runCommand(message, command, args) {
+        if (!command || !message) {
+            this.emit(Constants_js_1.CommandHandlerEvents.COMMAND_INVALID, message, command);
+            return;
+        }
+        const typing = command.typing || this.typing
+            ? setInterval(() => {
+                if (command.typing || this.typing)
+                    message.channel.sendTyping();
+            }, 9000)
+            : undefined;
+        try {
+            this.emit(Constants_js_1.CommandHandlerEvents.COMMAND_STARTED, message, command, args);
+            const ret = await command.exec(message, args);
+            this.emit(Constants_js_1.CommandHandlerEvents.COMMAND_FINISHED, message, command, args, ret);
+        }
+        finally {
+            if (typing)
+                clearInterval(typing);
+        }
     }
     /**
      * Parses the command and its argument list.
      * @param message - Message that called the command.
      */
-    parseCommand(message) {
-        var _a, _b;
-        return __awaiter(this, void 0, void 0, function* () {
-            const allowMention = yield Util_js_1.default.intoCallable(this.prefix)(message);
-            let prefixes = Util_js_1.default.intoArray(allowMention);
-            if (allowMention) {
-                const mentions = [
-                    `<@${(_a = this.client.user) === null || _a === void 0 ? void 0 : _a.id}>`,
-                    `<@!${(_b = this.client.user) === null || _b === void 0 ? void 0 : _b.id}>`,
-                ];
-                prefixes = [...mentions, ...prefixes];
-            }
-            prefixes.sort(Util_js_1.default.prefixCompare);
-            return this.parseMultiplePrefixes(message, prefixes.map((p) => [p, null]));
-        });
+    async parseCommand(message) {
+        const allowMention = await Util_js_1.default.intoCallable(this.prefix)(message);
+        let prefixes = Util_js_1.default.intoArray(allowMention);
+        if (allowMention) {
+            const mentions = [
+                `<@${this.client.user?.id}>`,
+                `<@!${this.client.user?.id}>`,
+            ];
+            prefixes = [...mentions, ...prefixes];
+        }
+        prefixes.sort(Util_js_1.default.prefixCompare);
+        return this.parseMultiplePrefixes(message, prefixes.map((p) => [p, null]));
     }
     /**
      * Parses the command and its argument list using prefix overwrites.
      * @param message - Message that called the command.
      */
-    parseCommandOverwrittenPrefixes(message) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!this.prefixes.size) {
-                return {};
-            }
-            const promises = this.prefixes.map((cmds, provider) => __awaiter(this, void 0, void 0, function* () {
-                const prefixes = Util_js_1.default.intoArray(yield Util_js_1.default.intoCallable(provider)(message));
-                return prefixes.map((p) => [p, cmds]);
-            }));
-            const pairs = (yield Promise.all(promises)).flat(1);
-            pairs.sort(([a], [b]) => Util_js_1.default.prefixCompare(a, b));
-            return this.parseMultiplePrefixes(message, pairs);
+    async parseCommandOverwrittenPrefixes(message) {
+        if (!this.prefixes.size) {
+            return {};
+        }
+        const promises = this.prefixes.map(async (cmds, provider) => {
+            const prefixes = Util_js_1.default.intoArray(await Util_js_1.default.intoCallable(provider)(message));
+            return prefixes.map((p) => [p, cmds]);
         });
+        const pairs = (await Promise.all(promises)).flat(1);
+        pairs.sort(([a], [b]) => Util_js_1.default.prefixCompare(a, b));
+        return this.parseMultiplePrefixes(message, pairs);
     }
     /**
      * Runs parseWithPrefix on multiple prefixes and returns the best parse.
@@ -819,7 +785,7 @@ class MessageCommandHandler extends AkairoHandler_js_1.default {
         if (!users)
             this.prompts.set(channel.id, new Set());
         users = this.prompts.get(channel.id);
-        users === null || users === void 0 ? void 0 : users.add(user.id);
+        users?.add(user.id);
     }
     /**
      * Removes an ongoing prompt.

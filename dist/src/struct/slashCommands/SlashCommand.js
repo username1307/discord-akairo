@@ -7,8 +7,8 @@ const AkairoError_1 = __importDefault(require("../../util/AkairoError"));
 const AkairoModule_1 = __importDefault(require("../AkairoModule"));
 class SlashCommand extends AkairoModule_1.default {
     constructor(id, options) {
-        super(id, { category: options === null || options === void 0 ? void 0 : options.category });
-        const { before = this.before || (() => undefined), channel = null, clientPermissions = this.clientPermissions, description, guarded = false, hidden = false, ignorePermissions, lock, name, ownerOnly = false, parentCommand, prefixId, shortName, slashDefaultPermission, slashOptions = [], commandType, userPermissions = this.userPermissions, } = options !== null && options !== void 0 ? options : {};
+        super(id, { category: options?.category });
+        const { before = this.before || (() => undefined), channel = null, clientPermissions = this.clientPermissions, description, guarded = false, hidden = false, ignorePermissions, lock, name, ownerOnly = false, parentCommand, prefixId, shortName, slashDefaultPermission, slashOptions = [], commandType, userPermissions = this.userPermissions, } = options ?? {};
         this.before = before.bind(this);
         this.channel = channel;
         this.clientPermissions =

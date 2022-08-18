@@ -96,7 +96,7 @@ class Util {
     }
     // eslint-disable-next-line complexity
     static deepEquals(a, b, options) {
-        const { ignoreUndefined = true, ignoreArrayOrder = true } = options !== null && options !== void 0 ? options : {};
+        const { ignoreUndefined = true, ignoreArrayOrder = true } = options ?? {};
         if (a === b)
             return true;
         if (typeof a !== 'object' || typeof b !== 'object')

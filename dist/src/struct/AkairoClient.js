@@ -10,10 +10,9 @@ const ClientUtil_js_1 = __importDefault(require("./ClientUtil.js"));
  */
 class AkairoClient extends discord_js_1.Client {
     constructor(options, clientOptions) {
-        var _a;
-        const combinedOptions = Object.assign(Object.assign({}, options), clientOptions);
+        const combinedOptions = { ...options, ...clientOptions };
         super(combinedOptions);
-        this.ownerID = (_a = combinedOptions.ownerID) !== null && _a !== void 0 ? _a : [];
+        this.ownerID = combinedOptions.ownerID ?? [];
         this.util = new ClientUtil_js_1.default(this);
     }
     /**

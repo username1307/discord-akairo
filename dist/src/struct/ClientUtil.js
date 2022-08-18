@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = require("discord.js");
 /**
@@ -57,7 +48,6 @@ class ClientUtil {
      * @param wholeWord - Makes checking by name match full word only.
      */
     checkEmoji(text, emoji, caseSensitive = false, wholeWord = false) {
-        var _a;
         if (emoji.id === text)
             return true;
         const reg = /<a?:[a-zA-Z0-9_]+:(\d{17,19})>/;
@@ -65,9 +55,9 @@ class ClientUtil {
         if (match && emoji.id === match[1])
             return true;
         text = caseSensitive ? text : text.toLowerCase();
-        const name = caseSensitive ? emoji.name : (_a = emoji.name) === null || _a === void 0 ? void 0 : _a.toLowerCase();
+        const name = caseSensitive ? emoji.name : emoji.name?.toLowerCase();
         if (!wholeWord) {
-            return Boolean((name === null || name === void 0 ? void 0 : name.includes(text)) || (name === null || name === void 0 ? void 0 : name.includes(text.replace(/:/, ''))));
+            return Boolean(name?.includes(text) || name?.includes(text.replace(/:/, '')));
         }
         return name === text || name === text.replace(/:/, '');
     }
@@ -184,9 +174,8 @@ class ClientUtil {
      * @param newMember - The new member.
      */
     compareStreaming(oldMember, newMember) {
-        var _a, _b;
-        const s1 = (_a = oldMember.presence) === null || _a === void 0 ? void 0 : _a.activities.find((c) => c.type === discord_js_1.ActivityType.Streaming);
-        const s2 = (_b = newMember.presence) === null || _b === void 0 ? void 0 : _b.activities.find((c) => c.type === discord_js_1.ActivityType.Streaming);
+        const s1 = oldMember.presence?.activities.find((c) => c.type === discord_js_1.ActivityType.Streaming);
+        const s2 = newMember.presence?.activities.find((c) => c.type === discord_js_1.ActivityType.Streaming);
         if (s1 === s2)
             return 0;
         if (s1)
@@ -208,11 +197,9 @@ class ClientUtil {
      * @param id - ID of the user.
      * @param cache - Whether to add to cache.
      */
-    fetchMember(guild, id, cache) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const user = yield this.client.users.fetch(id, { cache });
-            return guild.members.fetch({ user, cache });
-        });
+    async fetchMember(guild, id, cache) {
+        const user = await this.client.users.fetch(id, { cache });
+        return guild.members.fetch({ user, cache });
     }
     /**
      * Array of permission names.
@@ -228,8 +215,9 @@ class ClientUtil {
      * @param wholeWord - Makes finding by name match full word only.
      */
     resolveChannel(text, channels, caseSensitive = false, wholeWord = false) {
-        var _a, _b;
-        return ((_b = (_a = channels.get(text)) !== null && _a !== void 0 ? _a : channels.find((channel) => this.checkChannel(text, channel, caseSensitive, wholeWord))) !== null && _b !== void 0 ? _b : null);
+        return (channels.get(text) ??
+            channels.find((channel) => this.checkChannel(text, channel, caseSensitive, wholeWord)) ??
+            null);
     }
     /**
      * Resolves multiple channels from a string, such as an ID, a name, or a mention.
@@ -249,8 +237,9 @@ class ClientUtil {
      * @param wholeWord - Makes finding by name match full word only.
      */
     resolveEmoji(text, emojis, caseSensitive = false, wholeWord = false) {
-        var _a, _b;
-        return ((_b = (_a = emojis.get(text)) !== null && _a !== void 0 ? _a : emojis.find((emoji) => this.checkEmoji(text, emoji, caseSensitive, wholeWord))) !== null && _b !== void 0 ? _b : null);
+        return (emojis.get(text) ??
+            emojis.find((emoji) => this.checkEmoji(text, emoji, caseSensitive, wholeWord)) ??
+            null);
     }
     /**
      * Resolves multiple custom emojis from a string, such as a name or a mention.
@@ -270,8 +259,9 @@ class ClientUtil {
      * @param wholeWord - Makes finding by name match full word only.
      */
     resolveGuild(text, guilds, caseSensitive = false, wholeWord = false) {
-        var _a, _b;
-        return ((_b = (_a = guilds.get(text)) !== null && _a !== void 0 ? _a : guilds.find((guild) => this.checkGuild(text, guild, caseSensitive, wholeWord))) !== null && _b !== void 0 ? _b : null);
+        return (guilds.get(text) ??
+            guilds.find((guild) => this.checkGuild(text, guild, caseSensitive, wholeWord)) ??
+            null);
     }
     /**
      * Resolves multiple guilds from a string, such as an ID or a name.
@@ -291,8 +281,9 @@ class ClientUtil {
      * @param wholeWord - Makes finding by name match full word only.
      */
     resolveMember(text, members, caseSensitive = false, wholeWord = false) {
-        var _a, _b;
-        return ((_b = (_a = members.get(text)) !== null && _a !== void 0 ? _a : members.find((member) => this.checkMember(text, member, caseSensitive, wholeWord))) !== null && _b !== void 0 ? _b : null);
+        return (members.get(text) ??
+            members.find((member) => this.checkMember(text, member, caseSensitive, wholeWord)) ??
+            null);
     }
     /**
      * Resolves multiple members from a string, such as an ID, a name, or a mention.
@@ -325,8 +316,9 @@ class ClientUtil {
      * @param wholeWord - Makes finding by name match full word only.
      */
     resolveRole(text, roles, caseSensitive = false, wholeWord = false) {
-        var _a, _b;
-        return ((_b = (_a = roles.get(text)) !== null && _a !== void 0 ? _a : roles.find((role) => this.checkRole(text, role, caseSensitive, wholeWord))) !== null && _b !== void 0 ? _b : null);
+        return (roles.get(text) ??
+            roles.find((role) => this.checkRole(text, role, caseSensitive, wholeWord)) ??
+            null);
     }
     /**
      * Resolves multiple roles from a string, such as an ID, a name, or a mention.
@@ -346,8 +338,9 @@ class ClientUtil {
      * @param wholeWord - Makes finding by name match full word only.
      */
     resolveUser(text, users, caseSensitive = false, wholeWord = false) {
-        var _a, _b;
-        return ((_b = (_a = users.get(text)) !== null && _a !== void 0 ? _a : users.find((user) => this.checkUser(text, user, caseSensitive, wholeWord))) !== null && _b !== void 0 ? _b : null);
+        return (users.get(text) ??
+            users.find((user) => this.checkUser(text, user, caseSensitive, wholeWord)) ??
+            null);
     }
     /**
      * Resolves multiple users from a string, such as an ID, a name, or a mention.

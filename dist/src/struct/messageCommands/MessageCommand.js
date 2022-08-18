@@ -17,8 +17,8 @@ class MessageCommand extends AkairoModule_js_1.default {
      * @param options - Options for the command.
      */
     constructor(id, options) {
-        super(id, { category: options === null || options === void 0 ? void 0 : options.category });
-        const { aliases = [], args = this._args || this.args || [], argumentDefaults = {}, before = this.before || (() => undefined), channel = null, clientPermissions = this.clientPermissions, condition = this.condition || (() => false), cooldown = null, description = '', editable = true, flags = [], ignoreCooldown, ignorePermissions, lock, optionFlags = [], ownerOnly = false, prefix = this.prefix, quoted = true, ratelimit = 1, regex = this.regex, separator, superUserOnly = false, typing = false, userPermissions = this.userPermissions, } = options !== null && options !== void 0 ? options : {};
+        super(id, { category: options?.category });
+        const { aliases = [], args = this._args || this.args || [], argumentDefaults = {}, before = this.before || (() => undefined), channel = null, clientPermissions = this.clientPermissions, condition = this.condition || (() => false), cooldown = null, description = '', editable = true, flags = [], ignoreCooldown, ignorePermissions, lock, optionFlags = [], ownerOnly = false, prefix = this.prefix, quoted = true, ratelimit = 1, regex = this.regex, separator, superUserOnly = false, typing = false, userPermissions = this.userPermissions, } = options ?? {};
         this.aliases = aliases;
         const { flagWords, optionFlagWords } = Array.isArray(args)
             ? ContentParser_js_1.default.getFlags(args)

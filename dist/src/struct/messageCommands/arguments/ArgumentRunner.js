@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -44,39 +35,37 @@ class ArgumentRunner {
      * @param parsed - Parsed data from ContentParser.
      * @param generator - Argument generator.
      */
-    run(message, parsed, generator) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const state = {
-                usedIndices: new Set(),
-                phraseIndex: 0,
-                index: 0,
-            };
-            const augmentRest = (val) => {
-                if (Flag_js_1.default.is(val, 'continue')) {
-                    val.rest = parsed.all
-                        .slice(state.index)
-                        .map((x) => x.raw)
-                        .join('');
-                }
-            };
-            const iter = generator(message, parsed, state);
-            let curr = yield iter.next();
-            while (!curr.done) {
-                const value = curr.value;
-                if (ArgumentRunner.isShortCircuit(value)) {
-                    augmentRest(value);
-                    return value;
-                }
-                const res = yield this.runOne(message, parsed, state, new Argument_js_1.default(this.command, value));
-                if (ArgumentRunner.isShortCircuit(res)) {
-                    augmentRest(res);
-                    return res;
-                }
-                curr = yield iter.next(res);
+    async run(message, parsed, generator) {
+        const state = {
+            usedIndices: new Set(),
+            phraseIndex: 0,
+            index: 0,
+        };
+        const augmentRest = (val) => {
+            if (Flag_js_1.default.is(val, 'continue')) {
+                val.rest = parsed.all
+                    .slice(state.index)
+                    .map((x) => x.raw)
+                    .join('');
             }
-            augmentRest(curr.value);
-            return curr.value;
-        });
+        };
+        const iter = generator(message, parsed, state);
+        let curr = await iter.next();
+        while (!curr.done) {
+            const value = curr.value;
+            if (ArgumentRunner.isShortCircuit(value)) {
+                augmentRest(value);
+                return value;
+            }
+            const res = await this.runOne(message, parsed, state, new Argument_js_1.default(this.command, value));
+            if (ArgumentRunner.isShortCircuit(res)) {
+                augmentRest(res);
+                return res;
+            }
+            curr = await iter.next(res);
+        }
+        augmentRest(curr.value);
+        return curr.value;
     }
     /**
      * Runs one argument.
@@ -110,36 +99,34 @@ class ArgumentRunner {
      * @param state - Argument handling state.
      * @param arg - Current argument.
      */
-    runPhrase(message, parsed, state, arg) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (arg.unordered || arg.unordered === 0) {
-                const indices = typeof arg.unordered === 'number'
-                    ? Array.from(parsed.phrases.keys()).slice(arg.unordered)
-                    : Array.isArray(arg.unordered)
-                        ? arg.unordered
-                        : Array.from(parsed.phrases.keys());
-                for (const i of indices) {
-                    if (state.usedIndices.has(i)) {
-                        continue;
-                    }
-                    const phrase = parsed.phrases[i] ? parsed.phrases[i].value : '';
-                    // `cast` is used instead of `process` since we do not want prompts.
-                    const res = yield arg.cast(message, phrase);
-                    if (res != null) {
-                        state.usedIndices.add(i);
-                        return res;
-                    }
+    async runPhrase(message, parsed, state, arg) {
+        if (arg.unordered || arg.unordered === 0) {
+            const indices = typeof arg.unordered === 'number'
+                ? Array.from(parsed.phrases.keys()).slice(arg.unordered)
+                : Array.isArray(arg.unordered)
+                    ? arg.unordered
+                    : Array.from(parsed.phrases.keys());
+            for (const i of indices) {
+                if (state.usedIndices.has(i)) {
+                    continue;
                 }
-                // No indices matched.
-                return arg.process(message, '');
+                const phrase = parsed.phrases[i] ? parsed.phrases[i].value : '';
+                // `cast` is used instead of `process` since we do not want prompts.
+                const res = await arg.cast(message, phrase);
+                if (res != null) {
+                    state.usedIndices.add(i);
+                    return res;
+                }
             }
-            const index = arg.index == null ? state.phraseIndex : arg.index;
-            const ret = arg.process(message, parsed.phrases[index] ? parsed.phrases[index].value : '');
-            if (arg.index == null) {
-                ArgumentRunner.increaseIndex(parsed, state);
-            }
-            return ret;
-        });
+            // No indices matched.
+            return arg.process(message, '');
+        }
+        const index = arg.index == null ? state.phraseIndex : arg.index;
+        const ret = arg.process(message, parsed.phrases[index] ? parsed.phrases[index].value : '');
+        if (arg.index == null) {
+            ArgumentRunner.increaseIndex(parsed, state);
+        }
+        return ret;
     }
     /**
      * Runs `rest` match.
@@ -148,20 +135,18 @@ class ArgumentRunner {
      * @param state - Argument handling state.
      * @param arg - Current argument.
      */
-    runRest(message, parsed, state, arg) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const index = arg.index == null ? state.phraseIndex : arg.index;
-            const rest = parsed.phrases
-                .slice(index, index + arg.limit)
-                .map((x) => x.raw)
-                .join('')
-                .trim();
-            const ret = yield arg.process(message, rest);
-            if (arg.index == null) {
-                ArgumentRunner.increaseIndex(parsed, state);
-            }
-            return ret;
-        });
+    async runRest(message, parsed, state, arg) {
+        const index = arg.index == null ? state.phraseIndex : arg.index;
+        const rest = parsed.phrases
+            .slice(index, index + arg.limit)
+            .map((x) => x.raw)
+            .join('')
+            .trim();
+        const ret = await arg.process(message, rest);
+        if (arg.index == null) {
+            ArgumentRunner.increaseIndex(parsed, state);
+        }
+        return ret;
     }
     /**
      * Runs `separate` match.
@@ -170,30 +155,28 @@ class ArgumentRunner {
      * @param state - Argument handling state.
      * @param arg - Current argument.
      */
-    runSeparate(message, parsed, state, arg) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const index = arg.index == null ? state.phraseIndex : arg.index;
-            const phrases = parsed.phrases.slice(index, index + arg.limit);
-            if (!phrases.length) {
-                const ret = yield arg.process(message, '');
-                if (arg.index != null) {
-                    ArgumentRunner.increaseIndex(parsed, state);
-                }
-                return ret;
-            }
-            const res = [];
-            for (const phrase of phrases) {
-                const response = yield arg.process(message, phrase.value);
-                if (Flag_js_1.default.is(response, 'cancel')) {
-                    return response;
-                }
-                res.push(response);
-            }
+    async runSeparate(message, parsed, state, arg) {
+        const index = arg.index == null ? state.phraseIndex : arg.index;
+        const phrases = parsed.phrases.slice(index, index + arg.limit);
+        if (!phrases.length) {
+            const ret = await arg.process(message, '');
             if (arg.index != null) {
                 ArgumentRunner.increaseIndex(parsed, state);
             }
-            return res;
-        });
+            return ret;
+        }
+        const res = [];
+        for (const phrase of phrases) {
+            const response = await arg.process(message, phrase.value);
+            if (Flag_js_1.default.is(response, 'cancel')) {
+                return response;
+            }
+            res.push(response);
+        }
+        if (arg.index != null) {
+            ArgumentRunner.increaseIndex(parsed, state);
+        }
+        return res;
     }
     /**
      * Runs `flag` match.
@@ -205,10 +188,10 @@ class ArgumentRunner {
     runFlag(message, parsed, state, arg) {
         const names = Array.isArray(arg.flag) ? arg.flag : [arg.flag];
         if (arg.multipleFlags) {
-            const amount = parsed.flags.filter((flag) => names.some((name) => (name === null || name === void 0 ? void 0 : name.toLowerCase()) === flag.key.toLowerCase())).length;
+            const amount = parsed.flags.filter((flag) => names.some((name) => name?.toLowerCase() === flag.key.toLowerCase())).length;
             return amount;
         }
-        const flagFound = parsed.flags.some((flag) => names.some((name) => (name === null || name === void 0 ? void 0 : name.toLowerCase()) === flag.key.toLowerCase()));
+        const flagFound = parsed.flags.some((flag) => names.some((name) => name?.toLowerCase() === flag.key.toLowerCase()));
         return arg.default == null ? flagFound : !flagFound;
     }
     /**
@@ -218,23 +201,21 @@ class ArgumentRunner {
      * @param state - Argument handling state.
      * @param arg - Current argument.
      */
-    runOption(message, parsed, state, arg) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const names = Array.isArray(arg.flag) ? arg.flag : [arg.flag];
-            if (arg.multipleFlags) {
-                const values = parsed.optionFlags
-                    .filter((flag) => names.some((name) => (name === null || name === void 0 ? void 0 : name.toLowerCase()) === flag.key.toLowerCase()))
-                    .map((x) => x.value)
-                    .slice(0, arg.limit);
-                const res = [];
-                for (const value of values) {
-                    res.push(yield arg.process(message, value));
-                }
-                return res;
+    async runOption(message, parsed, state, arg) {
+        const names = Array.isArray(arg.flag) ? arg.flag : [arg.flag];
+        if (arg.multipleFlags) {
+            const values = parsed.optionFlags
+                .filter((flag) => names.some((name) => name?.toLowerCase() === flag.key.toLowerCase()))
+                .map((x) => x.value)
+                .slice(0, arg.limit);
+            const res = [];
+            for (const value of values) {
+                res.push(await arg.process(message, value));
             }
-            const foundFlag = parsed.optionFlags.find((flag) => names.some((name) => (name === null || name === void 0 ? void 0 : name.toLowerCase()) === flag.key.toLowerCase()));
-            return arg.process(message, foundFlag != null ? foundFlag.value : '');
-        });
+            return res;
+        }
+        const foundFlag = parsed.optionFlags.find((flag) => names.some((name) => name?.toLowerCase() === flag.key.toLowerCase()));
+        return arg.process(message, foundFlag != null ? foundFlag.value : '');
     }
     /**
      * Runs `text` match.
@@ -275,20 +256,18 @@ class ArgumentRunner {
      * @param state - Argument handling state.
      * @param arg - Current argument.
      */
-    runRestContent(message, parsed, state, arg) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const index = arg.index == null ? state.index : arg.index;
-            const rest = parsed.all
-                .slice(index, index + arg.limit)
-                .map((x) => x.raw)
-                .join('')
-                .trim();
-            const ret = yield arg.process(message, rest);
-            if (arg.index == null) {
-                ArgumentRunner.increaseIndex(parsed, state);
-            }
-            return ret;
-        });
+    async runRestContent(message, parsed, state, arg) {
+        const index = arg.index == null ? state.index : arg.index;
+        const rest = parsed.all
+            .slice(index, index + arg.limit)
+            .map((x) => x.raw)
+            .join('')
+            .trim();
+        const ret = await arg.process(message, rest);
+        if (arg.index == null) {
+            ArgumentRunner.increaseIndex(parsed, state);
+        }
+        return ret;
     }
     /**
      * Runs `none` match.

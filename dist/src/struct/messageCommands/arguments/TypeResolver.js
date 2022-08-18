@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = require("discord.js");
 const url_1 = require("url");
@@ -247,7 +238,7 @@ class TypeResolver {
                 if (!message.inGuild())
                     return null;
                 const channel = this.client.util.resolveChannel(phrase, message.guild.channels.cache);
-                if ((channel === null || channel === void 0 ? void 0 : channel.type) !== discord_js_1.ChannelType.GuildCategory)
+                if (channel?.type !== discord_js_1.ChannelType.GuildCategory)
                     return null;
                 return channel;
             },
@@ -270,7 +261,7 @@ class TypeResolver {
                 if (!message.inGuild())
                     return null;
                 const channel = this.client.util.resolveChannel(phrase, message.guild.channels.cache);
-                if ((channel === null || channel === void 0 ? void 0 : channel.type) !== discord_js_1.ChannelType.GuildNews)
+                if (channel?.type !== discord_js_1.ChannelType.GuildNews)
                     return null;
                 return channel;
             },
@@ -293,7 +284,7 @@ class TypeResolver {
                 if (!message.inGuild())
                     return null;
                 const channel = this.client.util.resolveChannel(phrase, message.guild.channels.cache);
-                if ((channel === null || channel === void 0 ? void 0 : channel.type) !== discord_js_1.ChannelType.GuildStageVoice)
+                if (channel?.type !== discord_js_1.ChannelType.GuildStageVoice)
                     return null;
                 return channel;
             },
@@ -384,7 +375,7 @@ class TypeResolver {
                     return null;
                 }
             },
-            [Constants_js_1.ArgumentTypes.GUILD_MESSAGE]: (message, phrase) => __awaiter(this, void 0, void 0, function* () {
+            [Constants_js_1.ArgumentTypes.GUILD_MESSAGE]: async (message, phrase) => {
                 if (!phrase)
                     return null;
                 if (!message.inGuild())
@@ -393,7 +384,7 @@ class TypeResolver {
                     if (!channel.isTextBased())
                         continue;
                     try {
-                        return yield channel.messages.fetch(phrase);
+                        return await channel.messages.fetch(phrase);
                     }
                     catch (err) {
                         if (/^Invalid Form Body/.test(err.message))
@@ -401,11 +392,11 @@ class TypeResolver {
                     }
                 }
                 return null;
-            }),
-            [Constants_js_1.ArgumentTypes.RELEVANT_MESSAGE]: (message, phrase) => __awaiter(this, void 0, void 0, function* () {
+            },
+            [Constants_js_1.ArgumentTypes.RELEVANT_MESSAGE]: async (message, phrase) => {
                 if (!phrase)
                     return null;
-                const hereMsg = yield message.channel.messages
+                const hereMsg = await message.channel.messages
                     .fetch(phrase)
                     .catch(() => null);
                 if (hereMsg) {
@@ -416,7 +407,7 @@ class TypeResolver {
                         if (!channel.isTextBased())
                             continue;
                         try {
-                            return yield channel.messages.fetch(phrase);
+                            return await channel.messages.fetch(phrase);
                         }
                         catch (err) {
                             if (/^Invalid Form Body/.test(err.message))
@@ -425,7 +416,7 @@ class TypeResolver {
                     }
                 }
                 return null;
-            }),
+            },
             [Constants_js_1.ArgumentTypes.INVITE]: (_message, phrase) => {
                 if (!phrase)
                     return null;
@@ -437,16 +428,14 @@ class TypeResolver {
                 }
             },
             [Constants_js_1.ArgumentTypes.USER_MENTION]: (_message, phrase) => {
-                var _a;
                 if (!phrase)
                     return null;
                 const id = phrase.match(/<@!?(\d{17,19})>/);
                 if (!id)
                     return null;
-                return (_a = this.client.users.cache.get(id[1])) !== null && _a !== void 0 ? _a : null;
+                return this.client.users.cache.get(id[1]) ?? null;
             },
             [Constants_js_1.ArgumentTypes.MEMBER_MENTION]: (message, phrase) => {
-                var _a;
                 if (!phrase)
                     return null;
                 if (!message.inGuild())
@@ -454,10 +443,9 @@ class TypeResolver {
                 const id = phrase.match(/<@!?(\d{17,19})>/);
                 if (!id)
                     return null;
-                return (_a = message.guild.members.cache.get(id[1])) !== null && _a !== void 0 ? _a : null;
+                return message.guild.members.cache.get(id[1]) ?? null;
             },
             [Constants_js_1.ArgumentTypes.CHANNEL_MENTION]: (message, phrase) => {
-                var _a;
                 if (!phrase)
                     return null;
                 if (!message.inGuild())
@@ -465,10 +453,9 @@ class TypeResolver {
                 const id = phrase.match(/<#(\d{17,19})>/);
                 if (!id)
                     return null;
-                return (_a = message.guild.channels.cache.get(id[1])) !== null && _a !== void 0 ? _a : null;
+                return message.guild.channels.cache.get(id[1]) ?? null;
             },
             [Constants_js_1.ArgumentTypes.ROLE_MENTION]: (message, phrase) => {
-                var _a;
                 if (!phrase)
                     return null;
                 if (!message.guild)
@@ -476,10 +463,9 @@ class TypeResolver {
                 const id = phrase.match(/<@&(\d{17,19})>/);
                 if (!id)
                     return null;
-                return (_a = message.guild.roles.cache.get(id[1])) !== null && _a !== void 0 ? _a : null;
+                return message.guild.roles.cache.get(id[1]) ?? null;
             },
             [Constants_js_1.ArgumentTypes.EMOJI_MENTION]: (message, phrase) => {
-                var _a;
                 if (!phrase)
                     return null;
                 if (!message.inGuild())
@@ -487,37 +473,32 @@ class TypeResolver {
                 const id = phrase.match(/<a?:[a-zA-Z0-9_]+:(\d{17,19})>/);
                 if (!id)
                     return null;
-                return (_a = message.guild.emojis.cache.get(id[1])) !== null && _a !== void 0 ? _a : null;
+                return message.guild.emojis.cache.get(id[1]) ?? null;
             },
             [Constants_js_1.ArgumentTypes.COMMAND_ALIAS]: (_message, phrase) => {
-                var _a;
                 if (!phrase)
                     return null;
-                return (_a = this.commandHandler.findCommand(phrase)) !== null && _a !== void 0 ? _a : null;
+                return this.commandHandler.findCommand(phrase) ?? null;
             },
             [Constants_js_1.ArgumentTypes.COMMAND]: (_message, phrase) => {
-                var _a;
                 if (!phrase)
                     return null;
-                return (_a = this.commandHandler.modules.get(phrase)) !== null && _a !== void 0 ? _a : null;
+                return this.commandHandler.modules.get(phrase) ?? null;
             },
             [Constants_js_1.ArgumentTypes.INHIBITOR]: (_message, phrase) => {
-                var _a, _b;
                 if (!phrase)
                     return null;
-                return (_b = (_a = this.inhibitorHandler) === null || _a === void 0 ? void 0 : _a.modules.get(phrase)) !== null && _b !== void 0 ? _b : null;
+                return this.inhibitorHandler?.modules.get(phrase) ?? null;
             },
             [Constants_js_1.ArgumentTypes.LISTENER]: (_message, phrase) => {
-                var _a, _b;
                 if (!phrase)
                     return null;
-                return (_b = (_a = this.listenerHandler) === null || _a === void 0 ? void 0 : _a.modules.get(phrase)) !== null && _b !== void 0 ? _b : null;
+                return this.listenerHandler?.modules.get(phrase) ?? null;
             },
             [Constants_js_1.ArgumentTypes.CONTEXT_MENU_COMMAND]: (_message, phrase) => {
-                var _a, _b;
                 if (!phrase)
                     return null;
-                return ((_b = (_a = this.contextMenuCommandHandler) === null || _a === void 0 ? void 0 : _a.modules.get(phrase)) !== null && _b !== void 0 ? _b : null);
+                return (this.contextMenuCommandHandler?.modules.get(phrase) ?? null);
             },
         };
         for (const [key, value] of Object.entries(builtIns)) {

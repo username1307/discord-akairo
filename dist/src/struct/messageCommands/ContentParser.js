@@ -55,7 +55,7 @@ const Constants_js_1 = require("../../util/Constants.js");
  */
 class Tokenizer {
     constructor(content, options) {
-        const { flagWords = [], optionFlagWords = [], quoted = true, separator, } = options !== null && options !== void 0 ? options : {};
+        const { flagWords = [], optionFlagWords = [], quoted = true, separator, } = options ?? {};
         this.content = content;
         this.flagWords = flagWords;
         this.optionFlagWords = optionFlagWords;

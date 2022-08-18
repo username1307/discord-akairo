@@ -10,7 +10,6 @@ class AkairoMessage extends discord_js_1.Base {
      * @param interaction - CommandInteraction
      */
     constructor(client, interaction) {
-        var _a;
         super(client);
         this.author = interaction.user;
         this.applicationId = interaction.applicationId;
@@ -34,7 +33,7 @@ class AkairoMessage extends discord_js_1.Base {
                     discord_js_1.ApplicationCommandOptionType.SubcommandGroup,
                 ].includes(option.type))
                     continue;
-                this.content += ` ${option.name}: ${(_a = options.get(option.name, false)) === null || _a === void 0 ? void 0 : _a.value}`;
+                this.content += ` ${option.name}: ${options.get(option.name, false)?.value}`;
             }
         }
         else if (interaction.isMessageContextMenuCommand()) {
@@ -75,10 +74,9 @@ class AkairoMessage extends discord_js_1.Base {
      * The url to jump to this message
      */
     get url() {
-        var _a;
         return this.interaction.ephemeral
             ? null
-            : `https://discord.com/channels/${this.guild ? this.guild.id : '@me'}/${(_a = this.channel) === null || _a === void 0 ? void 0 : _a.id}/${this.id}`;
+            : `https://discord.com/channels/${this.guild ? this.guild.id : '@me'}/${this.channel?.id}/${this.id}`;
     }
     /**
      * Indicates whether this interaction is received from a guild.

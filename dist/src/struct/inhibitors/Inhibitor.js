@@ -14,7 +14,7 @@ class Inhibitor extends AkairoModule_js_1.default {
      * @param options - Options for the inhibitor.
      */
     constructor(id, options) {
-        const { category, reason = '', type = 'post', priority = 0, } = options !== null && options !== void 0 ? options : {};
+        const { category, reason = '', type = 'post', priority = 0, } = options ?? {};
         super(id, { category });
         this.reason = reason;
         this.type = type;

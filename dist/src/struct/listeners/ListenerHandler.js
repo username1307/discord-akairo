@@ -17,7 +17,7 @@ class ListenerHandler extends AkairoHandler_js_1.default {
      * @param options - Options.
      */
     constructor(client, options) {
-        const { directory, classToHandle = Listener_js_1.default, extensions = ['.js', '.ts'], automateCategories, loadFilter, } = options !== null && options !== void 0 ? options : {};
+        const { directory, classToHandle = Listener_js_1.default, extensions = ['.js', '.ts'], automateCategories, loadFilter, } = options ?? {};
         if (!(classToHandle.prototype instanceof Listener_js_1.default ||
             classToHandle === Listener_js_1.default)) {
             throw new AkairoError_js_1.default('INVALID_CLASS_TO_HANDLE', classToHandle.name, Listener_js_1.default.name);
@@ -37,7 +37,6 @@ class ListenerHandler extends AkairoHandler_js_1.default {
      * @param id - ID of the listener.
      */
     addToEmitter(id) {
-        var _a;
         const listener = this.modules.get(id.toString());
         if (!listener)
             throw new AkairoError_js_1.default('MODULE_NOT_FOUND', this.classToHandle.name, id);
@@ -46,7 +45,7 @@ class ListenerHandler extends AkairoHandler_js_1.default {
             : this.emitters.get(listener.emitter);
         if (!Util_js_1.default.isEventEmitter(emitter))
             throw new AkairoError_js_1.default('INVALID_TYPE', 'emitter', 'EventEmitter', true);
-        emitter[(_a = listener.type) !== null && _a !== void 0 ? _a : 'on'](listener.event, listener.exec);
+        emitter[listener.type ?? 'on'](listener.event, listener.exec);
         return listener;
     }
     /**
