@@ -1,5 +1,4 @@
 import 'source-map-support/register';
-import packageJSON from '../package.json';
 import AkairoClient, { AkairoOptions } from './struct/AkairoClient';
 import AkairoHandler, {
     AkairoHandlerOptions,
@@ -96,8 +95,6 @@ import Category from './util/Category';
 import * as Constants from './util/Constants';
 import Util from './util/Util';
 
-const version = packageJSON.version;
-
 declare module 'discord.js' {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     export interface Message<Cached extends boolean = boolean> extends Base {
@@ -140,7 +137,6 @@ export {
     PromptContentModifier,
     TypeResolver,
     Util,
-    version,
 };
 export type {
     AkairoApplicationCommandAutocompleteOption,
