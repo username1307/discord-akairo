@@ -1,0 +1,29 @@
+{
+    "name": "discord-akairo",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "build": "tsc --build",
+        "watch": "tsc -w",
+        "lint": "eslint . --ext .ts",
+        "format": "prettier --write \"src/**/*.ts\"",
+        "test": "echo \"Error: no test specified\""
+    },
+    "keywords": [],
+    "author": "1Computer",
+    "license": "MIT",
+    "dependencies": {
+        "discord.js": "^14.2.0"
+    },
+    "devDependencies": {
+        "@typescript-eslint/eslint-plugin": "^5.33.1",
+        "@typescript-eslint/parser": "^5.33.1",
+        "eslint": "^8.22.0",
+        "eslint-config-prettier": "^8.5.0",
+        "eslint-plugin-prettier": "^4.2.1",
+        "prettier": "^2.7.1",
+        "reflect-metadata": "^0.1.13",
+        "typescript": "^4.7.4"
+    }
+}
