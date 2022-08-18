@@ -1,25 +1,30 @@
-import { Collection, ChannelType, } from 'discord.js';
-import AkairoError from '../../util/AkairoError.js';
-import { BuiltInReasons, CommandHandlerEvents } from '../../util/Constants.js';
-import Util from '../../util/Util.js';
-import AkairoHandler from '../AkairoHandler.js';
-import TypeResolver from './arguments/TypeResolver.js';
-import MessageCommand from './MessageCommand';
-import MessageCommandUtil from './MessageCommandUtil';
-import Flag from './Flag.js';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const discord_js_1 = require("discord.js");
+const AkairoError_js_1 = __importDefault(require("../../util/AkairoError.js"));
+const Constants_js_1 = require("../../util/Constants.js");
+const Util_js_1 = __importDefault(require("../../util/Util.js"));
+const AkairoHandler_js_1 = __importDefault(require("../AkairoHandler.js"));
+const TypeResolver_js_1 = __importDefault(require("./arguments/TypeResolver.js"));
+const MessageCommand_1 = __importDefault(require("./MessageCommand"));
+const MessageCommandUtil_1 = __importDefault(require("./MessageCommandUtil"));
+const Flag_js_1 = __importDefault(require("./Flag.js"));
 /**
  * Loads messageCommands and handles messages.
  */
-export default class MessageCommandHandler extends AkairoHandler {
+class MessageCommandHandler extends AkairoHandler_js_1.default {
     /**
      * @param client - The Akairo client.
      * @param options - Options.
      */
     constructor(client, options) {
-        const { directory, classToHandle = MessageCommand, extensions = ['.js', '.ts'], automateCategories, loadFilter, blockClient = true, blockBots = true, fetchMembers = false, handleEdits = false, storeMessages = false, commandUtil, commandUtilLifetime = 3e5, commandUtilSweepInterval = 3e5, defaultCooldown = 0, ignoreCooldown = client.ownerID, ignorePermissions = [], argumentDefaults = {}, prefix = '!', allowMention = true, aliasReplacement, typing = false, skipBuiltInPostInhibitors = false, } = options ?? {};
-        if (!(classToHandle.prototype instanceof MessageCommand ||
-            classToHandle === MessageCommand)) {
-            throw new AkairoError('INVALID_CLASS_TO_HANDLE', classToHandle.name, MessageCommand.name);
+        const { directory, classToHandle = MessageCommand_1.default, extensions = ['.js', '.ts'], automateCategories, loadFilter, blockClient = true, blockBots = true, fetchMembers = false, handleEdits = false, storeMessages = false, commandUtil, commandUtilLifetime = 3e5, commandUtilSweepInterval = 3e5, defaultCooldown = 0, ignoreCooldown = client.ownerID, ignorePermissions = [], argumentDefaults = {}, prefix = '!', allowMention = true, aliasReplacement, typing = false, skipBuiltInPostInhibitors = false, } = options ?? {};
+        if (!(classToHandle.prototype instanceof MessageCommand_1.default ||
+            classToHandle === MessageCommand_1.default)) {
+            throw new AkairoError_js_1.default('INVALID_CLASS_TO_HANDLE', classToHandle.name, MessageCommand_1.default.name);
         }
         super(client, {
             directory,
@@ -29,10 +34,10 @@ export default class MessageCommandHandler extends AkairoHandler {
             loadFilter,
         });
         this.typing = typing;
-        this.resolver = new TypeResolver(this);
-        this.aliases = new Collection();
+        this.resolver = new TypeResolver_js_1.default(this);
+        this.aliases = new discord_js_1.Collection();
         this.aliasReplacement = aliasReplacement;
-        this.prefixes = new Collection();
+        this.prefixes = new discord_js_1.Collection();
         this.blockClient = Boolean(blockClient);
         this.blockBots = Boolean(blockBots);
         this.fetchMembers = Boolean(fetchMembers);
@@ -40,13 +45,13 @@ export default class MessageCommandHandler extends AkairoHandler {
         this.storeMessages = Boolean(storeMessages);
         this.commandUtil = Boolean(commandUtil);
         if ((this.handleEdits || this.storeMessages) && !this.commandUtil)
-            throw new AkairoError('COMMAND_UTIL_EXPLICIT');
+            throw new AkairoError_js_1.default('COMMAND_UTIL_EXPLICIT');
         this.commandUtilLifetime = commandUtilLifetime;
         this.commandUtilSweepInterval = commandUtilSweepInterval;
         if (this.commandUtilSweepInterval > 0)
             setInterval(() => this.sweepCommandUtil(), this.commandUtilSweepInterval).unref();
-        this.commandUtils = new Collection();
-        this.cooldowns = new Collection();
+        this.commandUtils = new discord_js_1.Collection();
+        this.cooldowns = new discord_js_1.Collection();
         this.defaultCooldown = defaultCooldown;
         this.ignoreCooldown =
             typeof ignoreCooldown === 'function'
@@ -56,8 +61,8 @@ export default class MessageCommandHandler extends AkairoHandler {
             typeof ignorePermissions === 'function'
                 ? ignorePermissions.bind(this)
                 : ignorePermissions;
-        this.prompts = new Collection();
-        this.argumentDefaults = Util.deepAssign({
+        this.prompts = new discord_js_1.Collection();
+        this.argumentDefaults = Util_js_1.default.deepAssign({
             prompt: {
                 start: '',
                 retry: '',
@@ -109,7 +114,7 @@ export default class MessageCommandHandler extends AkairoHandler {
         if (this.commandUtil)
             this.client.on('messageDelete', (message) => {
                 if (message.inGuild()) {
-                    MessageCommandUtil.deletedMessages.add(message.id);
+                    MessageCommandUtil_1.default.deletedMessages.add(message.id);
                 }
             });
     }
@@ -123,7 +128,7 @@ export default class MessageCommandHandler extends AkairoHandler {
         for (let alias of command.aliases) {
             const conflict = this.aliases.get(alias.toLowerCase());
             if (conflict)
-                throw new AkairoError('ALIAS_CONFLICT', alias, command.id, conflict);
+                throw new AkairoError_js_1.default('ALIAS_CONFLICT', alias, command.id, conflict);
             alias = alias.toLowerCase();
             this.aliases.set(alias, command.id);
             if (this.aliasReplacement) {
@@ -131,7 +136,7 @@ export default class MessageCommandHandler extends AkairoHandler {
                 if (replacement !== alias) {
                     const replacementConflict = this.aliases.get(replacement);
                     if (replacementConflict)
-                        throw new AkairoError('ALIAS_CONFLICT', replacement, command.id, replacementConflict);
+                        throw new AkairoError_js_1.default('ALIAS_CONFLICT', replacement, command.id, replacementConflict);
                     this.aliases.set(replacement, command.id);
                 }
             }
@@ -161,7 +166,7 @@ export default class MessageCommandHandler extends AkairoHandler {
                 }
             }
             if (newEntry) {
-                this.prefixes = this.prefixes.sort((aVal, bVal, aKey, bKey) => Util.prefixCompare(aKey, bKey));
+                this.prefixes = this.prefixes.sort((aVal, bVal, aKey, bKey) => Util_js_1.default.prefixCompare(aKey, bKey));
             }
         }
     }
@@ -223,7 +228,7 @@ export default class MessageCommandHandler extends AkairoHandler {
                     message.util = this.commandUtils.get(message.id);
                 }
                 else {
-                    message.util = new MessageCommandUtil(this, message);
+                    message.util = new MessageCommandUtil_1.default(this, message);
                     this.commandUtils.set(message.id, message.util);
                 }
             }
@@ -249,7 +254,7 @@ export default class MessageCommandHandler extends AkairoHandler {
                 ran = await this.handleDirectCommand(message, parsed.content, parsed.command);
             }
             if (ran === false) {
-                this.emit(CommandHandlerEvents.MESSAGE_INVALID, message);
+                this.emit(Constants_js_1.CommandHandlerEvents.MESSAGE_INVALID, message);
                 return false;
             }
             return ran;
@@ -276,30 +281,30 @@ export default class MessageCommandHandler extends AkairoHandler {
                     return false;
             }
             const before = command.before(message);
-            if (Util.isPromise(before))
+            if (Util_js_1.default.isPromise(before))
                 await before;
             const args = await command.parse(message, content);
-            if (Flag.is(args, 'cancel')) {
-                this.emit(CommandHandlerEvents.COMMAND_CANCELLED, message, command);
+            if (Flag_js_1.default.is(args, 'cancel')) {
+                this.emit(Constants_js_1.CommandHandlerEvents.COMMAND_CANCELLED, message, command);
                 return true;
             }
-            else if (Flag.is(args, 'retry')) {
-                this.emit(CommandHandlerEvents.COMMAND_BREAKOUT, message, command, args.message);
+            else if (Flag_js_1.default.is(args, 'retry')) {
+                this.emit(Constants_js_1.CommandHandlerEvents.COMMAND_BREAKOUT, message, command, args.message);
                 return this.handle(args.message);
             }
-            else if (Flag.is(args, 'continue')) {
+            else if (Flag_js_1.default.is(args, 'continue')) {
                 const continueCommand = this.modules.get(args.command);
                 return this.handleDirectCommand(message, args.rest, continueCommand, args.ignore);
             }
             if (!ignore) {
                 if (command.lock)
                     key = command.lock(message, args);
-                if (Util.isPromise(key))
+                if (Util_js_1.default.isPromise(key))
                     key = await key;
                 if (key) {
                     if (command.locker?.has(key)) {
                         key = null;
-                        this.emit(CommandHandlerEvents.COMMAND_LOCKED, message, command);
+                        this.emit(Constants_js_1.CommandHandlerEvents.COMMAND_LOCKED, message, command);
                         return true;
                     }
                     command.locker?.add(key);
@@ -365,7 +370,7 @@ export default class MessageCommandHandler extends AkairoHandler {
                     if (await this.runPostTypeInhibitors(message, command))
                         return;
                     const before = command.before(message);
-                    if (Util.isPromise(before))
+                    if (Util_js_1.default.isPromise(before))
                         await before;
                     await this.runCommand(message, command, {
                         match,
@@ -392,7 +397,7 @@ export default class MessageCommandHandler extends AkairoHandler {
                 continue;
             filterPromises.push((async () => {
                 let cond = command.condition(message);
-                if (Util.isPromise(cond))
+                if (Util_js_1.default.isPromise(cond))
                     cond = await cond;
                 if (cond)
                     trueCommands.push(command);
@@ -409,7 +414,7 @@ export default class MessageCommandHandler extends AkairoHandler {
                     if (await this.runPostTypeInhibitors(message, command))
                         return;
                     const before = command.before(message);
-                    if (Util.isPromise(before))
+                    if (Util_js_1.default.isPromise(before))
                         await before;
                     await this.runCommand(message, command, {});
                 }
@@ -431,20 +436,20 @@ export default class MessageCommandHandler extends AkairoHandler {
             ? await this.inhibitorHandler.test('all', message)
             : null;
         if (reason != null) {
-            this.emit(CommandHandlerEvents.MESSAGE_BLOCKED, message, reason);
+            this.emit(Constants_js_1.CommandHandlerEvents.MESSAGE_BLOCKED, message, reason);
         }
         else if (!message.author) {
-            this.emit(CommandHandlerEvents.MESSAGE_BLOCKED, message, BuiltInReasons.AUTHOR_NOT_FOUND);
+            this.emit(Constants_js_1.CommandHandlerEvents.MESSAGE_BLOCKED, message, Constants_js_1.BuiltInReasons.AUTHOR_NOT_FOUND);
         }
         else if (this.blockClient &&
             message.author.id === this.client.user?.id) {
-            this.emit(CommandHandlerEvents.MESSAGE_BLOCKED, message, BuiltInReasons.CLIENT);
+            this.emit(Constants_js_1.CommandHandlerEvents.MESSAGE_BLOCKED, message, Constants_js_1.BuiltInReasons.CLIENT);
         }
         else if (this.blockBots && message.author.bot) {
-            this.emit(CommandHandlerEvents.MESSAGE_BLOCKED, message, BuiltInReasons.BOT);
+            this.emit(Constants_js_1.CommandHandlerEvents.MESSAGE_BLOCKED, message, Constants_js_1.BuiltInReasons.BOT);
         }
         else if (!slash && this.hasPrompt(message.channel, message.author)) {
-            this.emit(CommandHandlerEvents.IN_PROMPT, message);
+            this.emit(Constants_js_1.CommandHandlerEvents.IN_PROMPT, message);
         }
         else {
             return false;
@@ -460,7 +465,7 @@ export default class MessageCommandHandler extends AkairoHandler {
             ? await this.inhibitorHandler.test('pre', message)
             : null;
         if (reason != null) {
-            this.emit(CommandHandlerEvents.MESSAGE_BLOCKED, message, reason);
+            this.emit(Constants_js_1.CommandHandlerEvents.MESSAGE_BLOCKED, message, reason);
         }
         else {
             return false;
@@ -475,22 +480,22 @@ export default class MessageCommandHandler extends AkairoHandler {
      */
     async runPostTypeInhibitors(message, command, slash = false) {
         const event = slash
-            ? CommandHandlerEvents.SLASH_BLOCKED
-            : CommandHandlerEvents.COMMAND_BLOCKED;
+            ? Constants_js_1.CommandHandlerEvents.SLASH_BLOCKED
+            : Constants_js_1.CommandHandlerEvents.COMMAND_BLOCKED;
         if (!this.skipBuiltInPostInhibitors) {
             if (command.ownerOnly) {
                 const isOwner = this.client.isOwner(message.author);
                 if (!isOwner) {
-                    this.emit(event, message, command, BuiltInReasons.OWNER);
+                    this.emit(event, message, command, Constants_js_1.BuiltInReasons.OWNER);
                     return true;
                 }
             }
             if (command.channel === 'guild' && !message.guild) {
-                this.emit(event, message, command, BuiltInReasons.GUILD);
+                this.emit(event, message, command, Constants_js_1.BuiltInReasons.GUILD);
                 return true;
             }
             if (command.channel === 'dm' && message.guild) {
-                this.emit(event, message, command, BuiltInReasons.DM);
+                this.emit(event, message, command, Constants_js_1.BuiltInReasons.DM);
                 return true;
             }
         }
@@ -524,12 +529,12 @@ export default class MessageCommandHandler extends AkairoHandler {
      */
     async runPermissionChecks(message, command, slash = false) {
         const event = slash
-            ? CommandHandlerEvents.SLASH_MISSING_PERMISSIONS
-            : CommandHandlerEvents.MISSING_PERMISSIONS;
+            ? Constants_js_1.CommandHandlerEvents.SLASH_MISSING_PERMISSIONS
+            : Constants_js_1.CommandHandlerEvents.MISSING_PERMISSIONS;
         if (command.clientPermissions) {
             if (typeof command.clientPermissions === 'function') {
                 let missing = command.clientPermissions(message);
-                if (Util.isPromise(missing))
+                if (Util_js_1.default.isPromise(missing))
                     missing = await missing;
                 if (missing != null) {
                     this.emit(event, message, command, 'client', missing);
@@ -537,7 +542,7 @@ export default class MessageCommandHandler extends AkairoHandler {
                 }
             }
             else if (message.guild) {
-                if (message.channel?.type === ChannelType.DM)
+                if (message.channel?.type === discord_js_1.ChannelType.DM)
                     return false;
                 const missing = message.channel
                     ?.permissionsFor(message.guild.members.me)
@@ -558,7 +563,7 @@ export default class MessageCommandHandler extends AkairoHandler {
             if (!isIgnored) {
                 if (typeof command.userPermissions === 'function') {
                     let missing = command.userPermissions(message);
-                    if (Util.isPromise(missing))
+                    if (Util_js_1.default.isPromise(missing))
                         missing = await missing;
                     if (missing != null) {
                         this.emit(event, message, command, 'user', missing);
@@ -566,7 +571,7 @@ export default class MessageCommandHandler extends AkairoHandler {
                     }
                 }
                 else if (message.guild) {
-                    if (message.channel?.type === ChannelType.DM)
+                    if (message.channel?.type === discord_js_1.ChannelType.DM)
                         return false;
                     const missing = message.channel
                         ?.permissionsFor(message.author)
@@ -620,7 +625,7 @@ export default class MessageCommandHandler extends AkairoHandler {
         if (entry.uses >= command.ratelimit) {
             const end = this.cooldowns.get(id)[command.id].end;
             const diff = end - message.createdTimestamp;
-            this.emit(CommandHandlerEvents.COOLDOWN, message, command, diff);
+            this.emit(Constants_js_1.CommandHandlerEvents.COOLDOWN, message, command, diff);
             return true;
         }
         entry.uses++;
@@ -634,7 +639,7 @@ export default class MessageCommandHandler extends AkairoHandler {
      */
     async runCommand(message, command, args) {
         if (!command || !message) {
-            this.emit(CommandHandlerEvents.COMMAND_INVALID, message, command);
+            this.emit(Constants_js_1.CommandHandlerEvents.COMMAND_INVALID, message, command);
             return;
         }
         const typing = command.typing || this.typing
@@ -644,9 +649,9 @@ export default class MessageCommandHandler extends AkairoHandler {
             }, 9000)
             : undefined;
         try {
-            this.emit(CommandHandlerEvents.COMMAND_STARTED, message, command, args);
+            this.emit(Constants_js_1.CommandHandlerEvents.COMMAND_STARTED, message, command, args);
             const ret = await command.exec(message, args);
-            this.emit(CommandHandlerEvents.COMMAND_FINISHED, message, command, args, ret);
+            this.emit(Constants_js_1.CommandHandlerEvents.COMMAND_FINISHED, message, command, args, ret);
         }
         finally {
             if (typing)
@@ -658,8 +663,8 @@ export default class MessageCommandHandler extends AkairoHandler {
      * @param message - Message that called the command.
      */
     async parseCommand(message) {
-        const allowMention = await Util.intoCallable(this.prefix)(message);
-        let prefixes = Util.intoArray(allowMention);
+        const allowMention = await Util_js_1.default.intoCallable(this.prefix)(message);
+        let prefixes = Util_js_1.default.intoArray(allowMention);
         if (allowMention) {
             const mentions = [
                 `<@${this.client.user?.id}>`,
@@ -667,7 +672,7 @@ export default class MessageCommandHandler extends AkairoHandler {
             ];
             prefixes = [...mentions, ...prefixes];
         }
-        prefixes.sort(Util.prefixCompare);
+        prefixes.sort(Util_js_1.default.prefixCompare);
         return this.parseMultiplePrefixes(message, prefixes.map((p) => [p, null]));
     }
     /**
@@ -679,11 +684,11 @@ export default class MessageCommandHandler extends AkairoHandler {
             return {};
         }
         const promises = this.prefixes.map(async (cmds, provider) => {
-            const prefixes = Util.intoArray(await Util.intoCallable(provider)(message));
+            const prefixes = Util_js_1.default.intoArray(await Util_js_1.default.intoCallable(provider)(message));
             return prefixes.map((p) => [p, cmds]);
         });
         const pairs = (await Promise.all(promises)).flat(1);
-        pairs.sort(([a], [b]) => Util.prefixCompare(a, b));
+        pairs.sort(([a], [b]) => Util_js_1.default.prefixCompare(a, b));
         return this.parseMultiplePrefixes(message, pairs);
     }
     /**
@@ -745,8 +750,8 @@ export default class MessageCommandHandler extends AkairoHandler {
      * @param command - MessageCommand that errored.
      */
     emitError(err, message, command) {
-        if (this.listenerCount(CommandHandlerEvents.ERROR)) {
-            this.emit(CommandHandlerEvents.ERROR, err, message, command);
+        if (this.listenerCount(Constants_js_1.CommandHandlerEvents.ERROR)) {
+            this.emit(Constants_js_1.CommandHandlerEvents.ERROR, err, message, command);
             return;
         }
         throw err;
@@ -839,6 +844,7 @@ export default class MessageCommandHandler extends AkairoHandler {
         return this;
     }
 }
+exports.default = MessageCommandHandler;
 /**
  * @typedef {CommandInteractionOptionResolver} VSCodePleaseStopRemovingMyImports
  * @internal

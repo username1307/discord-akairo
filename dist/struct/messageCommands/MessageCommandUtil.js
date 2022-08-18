@@ -1,11 +1,16 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 /* eslint-disable require-await */
-import { Collection, MessagePayload, } from 'discord.js';
-import AkairoMessage from '../../util/AkairoMessage.js';
-import MessageCommandHandler from './MessageCommandHandler';
+const discord_js_1 = require("discord.js");
+const AkairoMessage_js_1 = __importDefault(require("../../util/AkairoMessage.js"));
+const MessageCommandHandler_1 = __importDefault(require("./MessageCommandHandler"));
 /**
  * MessageCommand utilities.
  */
-export default class MessageCommandUtil {
+class MessageCommandUtil {
     /**
      * @param handler - The command handler.
      * @param message - Message that triggered the command.
@@ -17,11 +22,11 @@ export default class MessageCommandUtil {
         this.shouldEdit = false;
         this.lastResponse = null;
         this.messages =
-            this.handler instanceof MessageCommandHandler &&
+            this.handler instanceof MessageCommandHandler_1.default &&
                 this.handler.storeMessages
-                ? new Collection()
+                ? new discord_js_1.Collection()
                 : null;
-        this.isSlash = this.message instanceof AkairoMessage;
+        this.isSlash = this.message instanceof AkairoMessage_js_1.default;
     }
     /**
      * Whether or not `this.message` has been deleted.
@@ -36,10 +41,10 @@ export default class MessageCommandUtil {
      * @param message - The message to test
      */
     isSlashMessage(message) {
-        return message instanceof AkairoMessage;
+        return message instanceof AkairoMessage_js_1.default;
     }
     addMessage(message) {
-        if (this.handler instanceof MessageCommandHandler &&
+        if (this.handler instanceof MessageCommandHandler_1.default &&
             this.handler.storeMessages) {
             if (Array.isArray(message)) {
                 for (const msg of message) {
@@ -64,7 +69,7 @@ export default class MessageCommandUtil {
         const newOptions = (typeof options === 'string' ? { content: options } : options);
         if (!this.isSlashMessage(this.message) &&
             !this.shouldEdit &&
-            !(newOptions instanceof MessagePayload) &&
+            !(newOptions instanceof discord_js_1.MessagePayload) &&
             !this.deleted) {
             newOptions.reply = {
                 messageReference: this.message,
@@ -153,6 +158,7 @@ export default class MessageCommandUtil {
         }
     }
 }
+exports.default = MessageCommandUtil;
 /**
  * Saved deleted message ids.
  */

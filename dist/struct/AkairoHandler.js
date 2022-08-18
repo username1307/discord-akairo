@@ -1,22 +1,27 @@
-import { Collection } from 'discord.js';
-import EventEmitter from 'events';
-import fs from 'fs';
-import path from 'path';
-import url from 'url';
-import AkairoError from '../util/AkairoError.js';
-import Category from '../util/Category.js';
-import { AkairoHandlerEvents } from '../util/Constants.js';
-import AkairoModule from './AkairoModule.js';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const discord_js_1 = require("discord.js");
+const events_1 = __importDefault(require("events"));
+const fs_1 = __importDefault(require("fs"));
+const path_1 = __importDefault(require("path"));
+const url_1 = __importDefault(require("url"));
+const AkairoError_js_1 = __importDefault(require("../util/AkairoError.js"));
+const Category_js_1 = __importDefault(require("../util/Category.js"));
+const Constants_js_1 = require("../util/Constants.js");
+const AkairoModule_js_1 = __importDefault(require("./AkairoModule.js"));
 /**
  * Base class for handling modules.
  */
-export default class AkairoHandler extends EventEmitter {
+class AkairoHandler extends events_1.default {
     /**
      * @param client - The Akairo client.
      * @param options - Options for module loading and handling.
      */
     constructor(client, options) {
-        const { directory, classToHandle = AkairoModule, extensions = ['.js', '.json', '.ts'], automateCategories = false, loadFilter = () => true, } = options ?? {};
+        const { directory, classToHandle = AkairoModule_js_1.default, extensions = ['.js', '.json', '.ts'], automateCategories = false, loadFilter = () => true, } = options ?? {};
         super();
         this.client = client;
         this.directory = directory;
@@ -24,8 +29,8 @@ export default class AkairoHandler extends EventEmitter {
         this.extensions = new Set(extensions);
         this.automateCategories = Boolean(automateCategories);
         this.loadFilter = loadFilter;
-        this.modules = new Collection();
-        this.categories = new Collection();
+        this.modules = new discord_js_1.Collection();
+        this.categories = new discord_js_1.Collection();
     }
     /**
      * Deregisters a module.
@@ -53,7 +58,7 @@ export default class AkairoHandler extends EventEmitter {
      */
     async load(thing, isReload = false) {
         const isClass = typeof thing === 'function';
-        if (!isClass && !this.extensions.has(path.extname(thing)))
+        if (!isClass && !this.extensions.has(path_1.default.extname(thing)))
             return undefined;
         let mod = isClass
             ? thing
@@ -64,7 +69,7 @@ export default class AkairoHandler extends EventEmitter {
                     return m;
                 return m.default ? findExport.call(this, m.default) : null;
                 // eslint-disable-next-line @typescript-eslint/no-var-requires
-            }.call(this, await eval(`import(${JSON.stringify(url.pathToFileURL(thing).toString())})`));
+            }.call(this, await eval(`import(${JSON.stringify(url_1.default.pathToFileURL(thing).toString())})`));
         if (mod && mod.prototype instanceof this.classToHandle) {
             mod = new mod(this); // eslint-disable-line new-cap
         }
@@ -74,9 +79,9 @@ export default class AkairoHandler extends EventEmitter {
             return undefined;
         }
         if (this.modules.has(mod.id))
-            throw new AkairoError('ALREADY_LOADED', this.classToHandle.name, mod.id);
+            throw new AkairoError_js_1.default('ALREADY_LOADED', this.classToHandle.name, mod.id);
         this.register(mod, isClass ? null : thing);
-        this.emit(AkairoHandlerEvents.LOAD, mod, isReload);
+        this.emit(Constants_js_1.AkairoHandlerEvents.LOAD, mod, isReload);
         return mod;
     }
     /**
@@ -90,7 +95,7 @@ export default class AkairoHandler extends EventEmitter {
         const filepaths = AkairoHandler.readdirRecursive(directory);
         const promises = [];
         for (let filepath of filepaths) {
-            filepath = path.resolve(filepath);
+            filepath = path_1.default.resolve(filepath);
             if (filter(filepath))
                 promises.push(this.load(filepath));
         }
@@ -108,11 +113,11 @@ export default class AkairoHandler extends EventEmitter {
         mod.handler = this;
         this.modules.set(mod.id, mod);
         if (mod.categoryID === 'default' && this.automateCategories) {
-            const dirs = path.dirname(filepath).split(path.sep);
+            const dirs = path_1.default.dirname(filepath).split(path_1.default.sep);
             mod.categoryID = dirs[dirs.length - 1];
         }
         if (!this.categories.has(mod.categoryID)) {
-            this.categories.set(mod.categoryID, new Category(mod.categoryID));
+            this.categories.set(mod.categoryID, new Category_js_1.default(mod.categoryID));
         }
         const category = this.categories.get(mod.categoryID);
         mod.category = category;
@@ -125,9 +130,9 @@ export default class AkairoHandler extends EventEmitter {
     async reload(id) {
         const mod = this.modules.get(id.toString());
         if (!mod)
-            throw new AkairoError('MODULE_NOT_FOUND', this.classToHandle.name, id);
+            throw new AkairoError_js_1.default('MODULE_NOT_FOUND', this.classToHandle.name, id);
         if (!mod.filepath)
-            throw new AkairoError('NOT_RELOADABLE', this.classToHandle.name, id);
+            throw new AkairoError_js_1.default('NOT_RELOADABLE', this.classToHandle.name, id);
         this.deregister(mod);
         const filepath = mod.filepath;
         const newMod = await this.load(filepath, true);
@@ -152,9 +157,9 @@ export default class AkairoHandler extends EventEmitter {
     remove(id) {
         const mod = this.modules.get(id.toString());
         if (!mod)
-            throw new AkairoError('MODULE_NOT_FOUND', this.classToHandle.name, id);
+            throw new AkairoError_js_1.default('MODULE_NOT_FOUND', this.classToHandle.name, id);
         this.deregister(mod);
-        this.emit(AkairoHandlerEvents.REMOVE, mod);
+        this.emit(Constants_js_1.AkairoHandlerEvents.REMOVE, mod);
         return mod;
     }
     /**
@@ -174,10 +179,10 @@ export default class AkairoHandler extends EventEmitter {
     static readdirRecursive(directory) {
         const result = [];
         (function read(dir) {
-            const files = fs.readdirSync(dir);
+            const files = fs_1.default.readdirSync(dir);
             for (const file of files) {
-                const filepath = path.join(dir, file);
-                if (fs.statSync(filepath).isDirectory()) {
+                const filepath = path_1.default.join(dir, file);
+                if (fs_1.default.statSync(filepath).isDirectory()) {
                     read(filepath);
                 }
                 else {
@@ -188,4 +193,5 @@ export default class AkairoHandler extends EventEmitter {
         return result;
     }
 }
+exports.default = AkairoHandler;
 //# sourceMappingURL=AkairoHandler.js.map

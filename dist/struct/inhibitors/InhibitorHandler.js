@@ -1,20 +1,25 @@
-import AkairoError from '../../util/AkairoError.js';
-import Util from '../../util/Util.js';
-import AkairoHandler from '../AkairoHandler.js';
-import Inhibitor from './Inhibitor.js';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const AkairoError_js_1 = __importDefault(require("../../util/AkairoError.js"));
+const Util_js_1 = __importDefault(require("../../util/Util.js"));
+const AkairoHandler_js_1 = __importDefault(require("../AkairoHandler.js"));
+const Inhibitor_js_1 = __importDefault(require("./Inhibitor.js"));
 /**
  * Loads inhibitors and checks messages.
  */
-export default class InhibitorHandler extends AkairoHandler {
+class InhibitorHandler extends AkairoHandler_js_1.default {
     /**
      * @param client - The Akairo client.
      * @param options - Options.
      */
     constructor(client, options) {
-        const { directory, classToHandle = Inhibitor, extensions = ['.js', '.ts'], automateCategories, loadFilter, } = options ?? {};
-        if (!(classToHandle.prototype instanceof Inhibitor ||
-            classToHandle === Inhibitor)) {
-            throw new AkairoError('INVALID_CLASS_TO_HANDLE', classToHandle.name, Inhibitor.name);
+        const { directory, classToHandle = Inhibitor_js_1.default, extensions = ['.js', '.ts'], automateCategories, loadFilter, } = options ?? {};
+        if (!(classToHandle.prototype instanceof Inhibitor_js_1.default ||
+            classToHandle === Inhibitor_js_1.default)) {
+            throw new AkairoError_js_1.default('INVALID_CLASS_TO_HANDLE', classToHandle.name, Inhibitor_js_1.default.name);
         }
         super(client, {
             directory,
@@ -41,7 +46,7 @@ export default class InhibitorHandler extends AkairoHandler {
         for (const inhibitor of inhibitors.values()) {
             promises.push((async () => {
                 let inhibited = inhibitor.exec(message, command);
-                if (Util.isPromise(inhibited))
+                if (Util_js_1.default.isPromise(inhibited))
                     inhibited = await inhibited;
                 if (inhibited)
                     return inhibitor;
@@ -55,4 +60,5 @@ export default class InhibitorHandler extends AkairoHandler {
         return inhibitedInhibitors[0].reason;
     }
 }
+exports.default = InhibitorHandler;
 //# sourceMappingURL=InhibitorHandler.js.map

@@ -1,16 +1,21 @@
-import { ArgumentMatches, ArgumentTypes } from '../../../util/Constants.js';
-import Util from '../../../util/Util.js';
-import Flag from '../Flag.js';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const Constants_js_1 = require("../../../util/Constants.js");
+const Util_js_1 = __importDefault(require("../../../util/Util.js"));
+const Flag_js_1 = __importDefault(require("../Flag.js"));
 /**
  * Represents an argument for a command.
  */
-export default class Argument {
+class Argument {
     /**
      * @param command - MessageCommand of the argument.
      * @param options - Options for the argument.
      */
     constructor(command, options = {}) {
-        const { match = ArgumentMatches.PHRASE, type = ArgumentTypes.STRING, flag = null, multipleFlags = false, index = null, unordered = false, limit = Infinity, prompt = null, default: defaultValue = null, otherwise = null, modifyOtherwise = null, } = options;
+        const { match = Constants_js_1.ArgumentMatches.PHRASE, type = Constants_js_1.ArgumentTypes.STRING, flag = null, multipleFlags = false, index = null, unordered = false, limit = Infinity, prompt = null, default: defaultValue = null, otherwise = null, modifyOtherwise = null, } = options;
         this.command = command;
         this.match = match;
         this.type = typeof type === 'function' ? type.bind(this) : type;
@@ -60,11 +65,11 @@ export default class Argument {
         Object.assign(promptOptions, this.command.argumentDefaults.prompt);
         Object.assign(promptOptions, this.prompt || {});
         const isInfinite = promptOptions.infinite ||
-            (this.match === ArgumentMatches.SEPARATE && !commandInput);
+            (this.match === Constants_js_1.ArgumentMatches.SEPARATE && !commandInput);
         const additionalRetry = Number(Boolean(commandInput));
         const values = isInfinite ? [] : null;
         const getText = async (promptType, prompter, retryCount, inputMessage, inputPhrase, inputParsed) => {
-            let text = await Util.intoCallable(prompter).call(this, message, {
+            let text = await Util_js_1.default.intoCallable(prompter).call(this, message, {
                 retries: retryCount,
                 infinite: isInfinite,
                 message: inputMessage,
@@ -132,12 +137,12 @@ export default class Argument {
                     if (message.util)
                         message.util.addMessage(sentTimeout);
                 }
-                return Flag.cancel();
+                return Flag_js_1.default.cancel();
             }
             if (promptOptions.breakout) {
                 const looksLike = await this.handler.parseCommand(input);
                 if (looksLike && looksLike.command)
-                    return Flag.retry(input);
+                    return Flag_js_1.default.retry(input);
             }
             if (input?.content.toLowerCase() ===
                 promptOptions.cancelWord.toLowerCase()) {
@@ -147,7 +152,7 @@ export default class Argument {
                     if (message.util)
                         message.util.addMessage(sentCancel);
                 }
-                return Flag.cancel();
+                return Flag_js_1.default.cancel();
             }
             if (isInfinite &&
                 input?.content.toLowerCase() ===
@@ -167,7 +172,7 @@ export default class Argument {
                     if (message.util)
                         message.util.addMessage(sentEnded);
                 }
-                return Flag.cancel();
+                return Flag_js_1.default.cancel();
             }
             if (isInfinite) {
                 values.push(parsedValue);
@@ -210,7 +215,7 @@ export default class Argument {
                 commandDefs.modifyOtherwise ??
                 handlerDefs.modifyOtherwise ??
                 null;
-            let text = await Util.intoCallable(otherwise).call(this, message, {
+            let text = await Util_js_1.default.intoCallable(otherwise).call(this, message, {
                 phrase,
                 failure,
             });
@@ -231,13 +236,13 @@ export default class Argument {
                 if (message.util)
                     message.util.addMessage(sent);
             }
-            return Flag.cancel();
+            return Flag_js_1.default.cancel();
         };
         if (!phrase && optional) {
             if (this.otherwise != null) {
                 return doOtherwise(null);
             }
-            return Util.intoCallable(this.default)(message, {
+            return Util_js_1.default.intoCallable(this.default)(message, {
                 phrase,
                 failure: null,
             });
@@ -252,7 +257,7 @@ export default class Argument {
             }
             return this.default == null
                 ? res
-                : Util.intoCallable(this.default)(message, {
+                : Util_js_1.default.intoCallable(this.default)(message, {
                     phrase,
                     failure: res,
                 });
@@ -275,7 +280,7 @@ export default class Argument {
         }
         if (typeof type === 'function') {
             let res = type(message, phrase);
-            if (Util.isPromise(res))
+            if (Util_js_1.default.isPromise(res))
                 res = await res;
             return res;
         }
@@ -294,7 +299,7 @@ export default class Argument {
         }
         if (resolver.type(type)) {
             let res = resolver.type(type)?.call(this, message, phrase);
-            if (Util.isPromise(res))
+            if (Util_js_1.default.isPromise(res))
                 res = await res;
             return res;
         }
@@ -329,7 +334,7 @@ export default class Argument {
      * @param value - Value to check.
      */
     static isFailure(value) {
-        return value == null || Flag.is(value, 'fail');
+        return value == null || Flag_js_1.default.is(value, 'fail');
     }
     static product(...types) {
         return async function typeFn(message, phrase) {
@@ -363,7 +368,7 @@ export default class Argument {
                 type = type.bind(this);
             const res = await Argument.cast(type, this.handler.resolver, message, phrase);
             if (Argument.isFailure(res)) {
-                return Flag.fail({ tag, value: res });
+                return Flag_js_1.default.fail({ tag, value: res });
             }
             return { tag, value: res };
         };
@@ -385,7 +390,7 @@ export default class Argument {
                 type = type.bind(this);
             const res = await Argument.cast(type, this.handler.resolver, message, phrase);
             if (Argument.isFailure(res)) {
-                return Flag.fail({ tag, input: phrase, value: res });
+                return Flag_js_1.default.fail({ tag, input: phrase, value: res });
             }
             return { tag, input: phrase, value: res };
         };
@@ -420,10 +425,11 @@ export default class Argument {
                 type = type.bind(this);
             const res = await Argument.cast(type, this.handler.resolver, message, phrase);
             if (Argument.isFailure(res)) {
-                return Flag.fail({ input: phrase, value: res });
+                return Flag_js_1.default.fail({ input: phrase, value: res });
             }
             return { input: phrase, value: res };
         };
     }
 }
+exports.default = Argument;
 //# sourceMappingURL=Argument.js.map

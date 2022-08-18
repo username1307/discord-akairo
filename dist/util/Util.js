@@ -1,7 +1,9 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * Akairo Utilities.
  */
-export default class Util {
+class Util {
     /**
      * Deep assign properties to an object.
      * @param target
@@ -150,4 +152,5 @@ export default class Util {
             .join('');
     }
 }
+exports.default = Util;
 //# sourceMappingURL=Util.js.map

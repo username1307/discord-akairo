@@ -1,7 +1,9 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * Represents a special return value during command execution or argument parsing.
  */
-export default class Flag {
+class Flag {
     /**
      * @param type - Type of flag.
      * @param data - Extra data.
@@ -48,4 +50,5 @@ export default class Flag {
         return value instanceof Flag && value.type === type;
     }
 }
+exports.default = Flag;
 //# sourceMappingURL=Flag.js.map

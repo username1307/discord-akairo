@@ -1,20 +1,25 @@
-import AkairoError from '../../util/AkairoError.js';
-import { BuiltInReasons, ContextCommandHandlerEvents, } from '../../util/Constants.js';
-import AkairoHandler from '../AkairoHandler.js';
-import ContextMenuCommand from './ContextMenuCommand.js';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const AkairoError_js_1 = __importDefault(require("../../util/AkairoError.js"));
+const Constants_js_1 = require("../../util/Constants.js");
+const AkairoHandler_js_1 = __importDefault(require("../AkairoHandler.js"));
+const ContextMenuCommand_js_1 = __importDefault(require("./ContextMenuCommand.js"));
 /**
  * Loads context menu messageCommands and handles them.
  */
-export default class ContextMenuCommandHandler extends AkairoHandler {
+class ContextMenuCommandHandler extends AkairoHandler_js_1.default {
     /**
      * @param client - The Akairo client.
      * @param options - Options.
      */
     constructor(client, options) {
-        const { directory, classToHandle = ContextMenuCommand, extensions = ['.js', '.ts'], automateCategories, loadFilter, } = options ?? {};
-        if (!(classToHandle.prototype instanceof ContextMenuCommand ||
-            classToHandle === ContextMenuCommand)) {
-            throw new AkairoError('INVALID_CLASS_TO_HANDLE', classToHandle.name, ContextMenuCommand.name);
+        const { directory, classToHandle = ContextMenuCommand_js_1.default, extensions = ['.js', '.ts'], automateCategories, loadFilter, } = options ?? {};
+        if (!(classToHandle.prototype instanceof ContextMenuCommand_js_1.default ||
+            classToHandle === ContextMenuCommand_js_1.default)) {
+            throw new AkairoError_js_1.default('INVALID_CLASS_TO_HANDLE', classToHandle.name, ContextMenuCommand_js_1.default.name);
         }
         super(client, {
             directory,
@@ -44,16 +49,16 @@ export default class ContextMenuCommandHandler extends AkairoHandler {
     async handle(interaction) {
         const command = this.modules.find((module) => module.name === interaction.commandName);
         if (!command) {
-            this.emit(ContextCommandHandlerEvents.NOT_FOUND, interaction);
+            this.emit(Constants_js_1.ContextCommandHandlerEvents.NOT_FOUND, interaction);
             return false;
         }
         if (command.ownerOnly && !this.client.isOwner(interaction.user.id)) {
-            this.emit(ContextCommandHandlerEvents.BLOCKED, interaction, command, BuiltInReasons.OWNER);
+            this.emit(Constants_js_1.ContextCommandHandlerEvents.BLOCKED, interaction, command, Constants_js_1.BuiltInReasons.OWNER);
         }
         try {
-            this.emit(ContextCommandHandlerEvents.STARTED, interaction, command);
+            this.emit(Constants_js_1.ContextCommandHandlerEvents.STARTED, interaction, command);
             const ret = await command.exec(interaction);
-            this.emit(ContextCommandHandlerEvents.FINISHED, interaction, command, ret);
+            this.emit(Constants_js_1.ContextCommandHandlerEvents.FINISHED, interaction, command, ret);
             return true;
         }
         catch (err) {
@@ -68,11 +73,12 @@ export default class ContextMenuCommandHandler extends AkairoHandler {
      * @param command - MessageCommand that errored.
      */
     emitError(err, interaction, command) {
-        if (this.listenerCount(ContextCommandHandlerEvents.ERROR)) {
-            this.emit(ContextCommandHandlerEvents.ERROR, err, interaction, command);
+        if (this.listenerCount(Constants_js_1.ContextCommandHandlerEvents.ERROR)) {
+            this.emit(Constants_js_1.ContextCommandHandlerEvents.ERROR, err, interaction, command);
             return;
         }
         throw err;
     }
 }
+exports.default = ContextMenuCommandHandler;
 //# sourceMappingURL=ContextMenuCommandHandler.js.map

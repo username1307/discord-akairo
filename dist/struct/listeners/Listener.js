@@ -1,9 +1,14 @@
-import AkairoError from '../../util/AkairoError.js';
-import AkairoModule from '../AkairoModule.js';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const AkairoError_js_1 = __importDefault(require("../../util/AkairoError.js"));
+const AkairoModule_js_1 = __importDefault(require("../AkairoModule.js"));
 /**
  * Represents a listener.
  */
-export default class Listener extends AkairoModule {
+class Listener extends AkairoModule_js_1.default {
     /**
      * @param id - Listener ID.
      * @param options - Options for the listener.
@@ -20,7 +25,8 @@ export default class Listener extends AkairoModule {
      * @param args - Arguments.
      */
     exec(...args) {
-        throw new AkairoError('NOT_IMPLEMENTED', this.constructor.name, 'exec');
+        throw new AkairoError_js_1.default('NOT_IMPLEMENTED', this.constructor.name, 'exec');
     }
 }
+exports.default = Listener;
 //# sourceMappingURL=Listener.js.map

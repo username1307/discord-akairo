@@ -1,11 +1,13 @@
-import { ChannelType, Collection, } from 'discord.js';
-import { URL } from 'url';
-import { ArgumentTypes } from '../../../util/Constants.js';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const discord_js_1 = require("discord.js");
+const url_1 = require("url");
+const Constants_js_1 = require("../../../util/Constants.js");
 /**
  * Type resolver for command arguments.
  * The types are documented under ArgumentType.
  */
-export default class TypeResolver {
+class TypeResolver {
     /**
      * @param handler - The command handler.
      */
@@ -15,7 +17,7 @@ export default class TypeResolver {
         this.inhibitorHandler = null;
         this.listenerHandler = null;
         this.contextMenuCommandHandler = null;
-        this.types = new Collection();
+        this.types = new discord_js_1.Collection();
         this.addBuiltInTypes();
     }
     /**
@@ -23,16 +25,16 @@ export default class TypeResolver {
      */
     addBuiltInTypes() {
         const builtIns = {
-            [ArgumentTypes.STRING]: (_message, phrase) => {
+            [Constants_js_1.ArgumentTypes.STRING]: (_message, phrase) => {
                 return phrase || null;
             },
-            [ArgumentTypes.LOWERCASE]: (_message, phrase) => {
+            [Constants_js_1.ArgumentTypes.LOWERCASE]: (_message, phrase) => {
                 return phrase ? phrase.toLowerCase() : null;
             },
-            [ArgumentTypes.UPPERCASE]: (_message, phrase) => {
+            [Constants_js_1.ArgumentTypes.UPPERCASE]: (_message, phrase) => {
                 return phrase ? phrase.toUpperCase() : null;
             },
-            [ArgumentTypes.CHAR_CODES]: (_message, phrase) => {
+            [Constants_js_1.ArgumentTypes.CHAR_CODES]: (_message, phrase) => {
                 if (!phrase)
                     return null;
                 const codes = [];
@@ -40,23 +42,23 @@ export default class TypeResolver {
                     codes.push(char.charCodeAt(0));
                 return codes;
             },
-            [ArgumentTypes.NUMBER]: (_message, phrase) => {
+            [Constants_js_1.ArgumentTypes.NUMBER]: (_message, phrase) => {
                 if (!phrase || isNaN(+phrase))
                     return null;
                 return parseFloat(phrase);
             },
-            [ArgumentTypes.INTEGER]: (_message, phrase) => {
+            [Constants_js_1.ArgumentTypes.INTEGER]: (_message, phrase) => {
                 if (!phrase || isNaN(+phrase))
                     return null;
                 return parseInt(phrase);
             },
-            [ArgumentTypes.BIGINT]: (_message, phrase) => {
+            [Constants_js_1.ArgumentTypes.BIGINT]: (_message, phrase) => {
                 if (!phrase || isNaN(+phrase))
                     return null;
                 return BigInt(phrase);
             },
             // Just for fun.
-            [ArgumentTypes.EMOJINT]: (_message, phrase) => {
+            [Constants_js_1.ArgumentTypes.EMOJINT]: (_message, phrase) => {
                 if (!phrase)
                     return null;
                 const n = phrase.replace(/0⃣|1⃣|2⃣|3⃣|4⃣|5⃣|6⃣|7⃣|8⃣|9⃣|🔟/g, (m) => {
@@ -80,19 +82,19 @@ export default class TypeResolver {
                     return null;
                 return parseInt(n);
             },
-            [ArgumentTypes.URL]: (_message, phrase) => {
+            [Constants_js_1.ArgumentTypes.URL]: (_message, phrase) => {
                 if (!phrase)
                     return null;
                 if (/^<.+>$/.test(phrase))
                     phrase = phrase.slice(1, -1);
                 try {
-                    return new URL(phrase);
+                    return new url_1.URL(phrase);
                 }
                 catch (err) {
                     return null;
                 }
             },
-            [ArgumentTypes.DATE]: (_message, phrase) => {
+            [Constants_js_1.ArgumentTypes.DATE]: (_message, phrase) => {
                 if (!phrase)
                     return null;
                 const timestamp = Date.parse(phrase);
@@ -100,7 +102,7 @@ export default class TypeResolver {
                     return null;
                 return new Date(timestamp);
             },
-            [ArgumentTypes.COLOR]: (_message, phrase) => {
+            [Constants_js_1.ArgumentTypes.COLOR]: (_message, phrase) => {
                 if (!phrase)
                     return null;
                 const color = parseInt(phrase.replace('#', ''), 16);
@@ -109,25 +111,25 @@ export default class TypeResolver {
                 }
                 return color;
             },
-            [ArgumentTypes.USER]: (_message, phrase) => {
+            [Constants_js_1.ArgumentTypes.USER]: (_message, phrase) => {
                 if (!phrase)
                     return null;
                 return this.client.util.resolveUser(phrase, this.client.users.cache);
             },
-            [ArgumentTypes.USERS]: (_message, phrase) => {
+            [Constants_js_1.ArgumentTypes.USERS]: (_message, phrase) => {
                 if (!phrase)
                     return null;
                 const users = this.client.util.resolveUsers(phrase, this.client.users.cache);
                 return users.size ? users : null;
             },
-            [ArgumentTypes.MEMBER]: (message, phrase) => {
+            [Constants_js_1.ArgumentTypes.MEMBER]: (message, phrase) => {
                 if (!phrase)
                     return null;
                 if (!message.inGuild())
                     return null;
                 return this.client.util.resolveMember(phrase, message.guild.members.cache);
             },
-            [ArgumentTypes.MEMBERS]: (message, phrase) => {
+            [Constants_js_1.ArgumentTypes.MEMBERS]: (message, phrase) => {
                 if (!phrase)
                     return null;
                 if (!message.inGuild())
@@ -135,12 +137,12 @@ export default class TypeResolver {
                 const members = this.client.util.resolveMembers(phrase, message.guild.members.cache);
                 return members.size ? members : null;
             },
-            [ArgumentTypes.RELEVANT]: (message, phrase) => {
+            [Constants_js_1.ArgumentTypes.RELEVANT]: (message, phrase) => {
                 if (!phrase)
                     return null;
                 const person = message.inGuild()
                     ? this.client.util.resolveMember(phrase, message.guild.members.cache)
-                    : this.client.util.resolveUser(phrase, new Collection([
+                    : this.client.util.resolveUser(phrase, new discord_js_1.Collection([
                         [
                             message.channel.recipient.id,
                             message.channel.recipient,
@@ -151,12 +153,12 @@ export default class TypeResolver {
                     return null;
                 return message.guild ? person.user : person;
             },
-            [ArgumentTypes.RELEVANTS]: (message, phrase) => {
+            [Constants_js_1.ArgumentTypes.RELEVANTS]: (message, phrase) => {
                 if (!phrase)
                     return null;
                 const persons = message.inGuild()
                     ? this.client.util.resolveMembers(phrase, message.guild.members.cache)
-                    : this.client.util.resolveUsers(phrase, new Collection([
+                    : this.client.util.resolveUsers(phrase, new discord_js_1.Collection([
                         [
                             message.channel.recipient.id,
                             message.channel.recipient,
@@ -169,14 +171,14 @@ export default class TypeResolver {
                     ? persons.mapValues((member) => member.user)
                     : persons;
             },
-            [ArgumentTypes.CHANNEL]: (message, phrase) => {
+            [Constants_js_1.ArgumentTypes.CHANNEL]: (message, phrase) => {
                 if (!phrase)
                     return null;
                 if (!message.inGuild())
                     return null;
                 return this.client.util.resolveChannel(phrase, message.guild.channels.cache);
             },
-            [ArgumentTypes.CHANNELS]: (message, phrase) => {
+            [Constants_js_1.ArgumentTypes.CHANNELS]: (message, phrase) => {
                 if (!phrase)
                     return null;
                 if (!message.inGuild())
@@ -184,17 +186,17 @@ export default class TypeResolver {
                 const channels = this.client.util.resolveChannels(phrase, message.guild.channels.cache);
                 return channels.size ? channels : null;
             },
-            [ArgumentTypes.TEXT_CHANNEL]: (message, phrase) => {
+            [Constants_js_1.ArgumentTypes.TEXT_CHANNEL]: (message, phrase) => {
                 if (!phrase)
                     return null;
                 if (!message.inGuild())
                     return null;
                 const channel = this.client.util.resolveChannel(phrase, message.guild.channels.cache);
-                if (!channel || channel.type !== ChannelType.GuildText)
+                if (!channel || channel.type !== discord_js_1.ChannelType.GuildText)
                     return null;
                 return channel;
             },
-            [ArgumentTypes.TEXT_CHANNELS]: (message, phrase) => {
+            [Constants_js_1.ArgumentTypes.TEXT_CHANNELS]: (message, phrase) => {
                 if (!phrase)
                     return null;
                 if (!message.inGuild())
@@ -202,22 +204,22 @@ export default class TypeResolver {
                 const channels = this.client.util.resolveChannels(phrase, message.guild.channels.cache);
                 if (!channels.size)
                     return null;
-                const textChannels = channels.filter((c) => c.type === ChannelType.GuildText);
+                const textChannels = channels.filter((c) => c.type === discord_js_1.ChannelType.GuildText);
                 return textChannels.size
                     ? textChannels
                     : null;
             },
-            [ArgumentTypes.VOICE_CHANNEL]: (message, phrase) => {
+            [Constants_js_1.ArgumentTypes.VOICE_CHANNEL]: (message, phrase) => {
                 if (!phrase)
                     return null;
                 if (!message.inGuild())
                     return null;
                 const channel = this.client.util.resolveChannel(phrase, message.guild.channels.cache);
-                if (!channel || channel.type !== ChannelType.GuildVoice)
+                if (!channel || channel.type !== discord_js_1.ChannelType.GuildVoice)
                     return null;
                 return channel;
             },
-            [ArgumentTypes.VOICE_CHANNELS]: (message, phrase) => {
+            [Constants_js_1.ArgumentTypes.VOICE_CHANNELS]: (message, phrase) => {
                 if (!phrase)
                     return null;
                 if (!message.inGuild())
@@ -225,22 +227,22 @@ export default class TypeResolver {
                 const channels = this.client.util.resolveChannels(phrase, message.guild.channels.cache);
                 if (!channels.size)
                     return null;
-                const voiceChannels = channels.filter((c) => c.type === ChannelType.GuildVoice);
+                const voiceChannels = channels.filter((c) => c.type === discord_js_1.ChannelType.GuildVoice);
                 return voiceChannels.size
                     ? voiceChannels
                     : null;
             },
-            [ArgumentTypes.CATEGORY_CHANNEL]: (message, phrase) => {
+            [Constants_js_1.ArgumentTypes.CATEGORY_CHANNEL]: (message, phrase) => {
                 if (!phrase)
                     return null;
                 if (!message.inGuild())
                     return null;
                 const channel = this.client.util.resolveChannel(phrase, message.guild.channels.cache);
-                if (channel?.type !== ChannelType.GuildCategory)
+                if (channel?.type !== discord_js_1.ChannelType.GuildCategory)
                     return null;
                 return channel;
             },
-            [ArgumentTypes.CATEGORY_CHANNELS]: (message, phrase) => {
+            [Constants_js_1.ArgumentTypes.CATEGORY_CHANNELS]: (message, phrase) => {
                 if (!phrase)
                     return null;
                 if (!message.inGuild())
@@ -248,22 +250,22 @@ export default class TypeResolver {
                 const channels = this.client.util.resolveChannels(phrase, message.guild.channels.cache);
                 if (!channels.size)
                     return null;
-                const categoryChannels = channels.filter((c) => c.type === ChannelType.GuildCategory);
+                const categoryChannels = channels.filter((c) => c.type === discord_js_1.ChannelType.GuildCategory);
                 return categoryChannels.size
                     ? categoryChannels
                     : null;
             },
-            [ArgumentTypes.NEWS_CHANNEL]: (message, phrase) => {
+            [Constants_js_1.ArgumentTypes.NEWS_CHANNEL]: (message, phrase) => {
                 if (!phrase)
                     return null;
                 if (!message.inGuild())
                     return null;
                 const channel = this.client.util.resolveChannel(phrase, message.guild.channels.cache);
-                if (channel?.type !== ChannelType.GuildNews)
+                if (channel?.type !== discord_js_1.ChannelType.GuildNews)
                     return null;
                 return channel;
             },
-            [ArgumentTypes.NEWS_CHANNELS]: (message, phrase) => {
+            [Constants_js_1.ArgumentTypes.NEWS_CHANNELS]: (message, phrase) => {
                 if (!phrase)
                     return null;
                 if (!message.inGuild())
@@ -271,22 +273,22 @@ export default class TypeResolver {
                 const channels = this.client.util.resolveChannels(phrase, message.guild.channels.cache);
                 if (!channels.size)
                     return null;
-                const newsChannels = channels.filter((c) => c.type === ChannelType.GuildNews);
+                const newsChannels = channels.filter((c) => c.type === discord_js_1.ChannelType.GuildNews);
                 return newsChannels.size
                     ? newsChannels
                     : null;
             },
-            [ArgumentTypes.STAGE_CHANNEL]: (message, phrase) => {
+            [Constants_js_1.ArgumentTypes.STAGE_CHANNEL]: (message, phrase) => {
                 if (!phrase)
                     return null;
                 if (!message.inGuild())
                     return null;
                 const channel = this.client.util.resolveChannel(phrase, message.guild.channels.cache);
-                if (channel?.type !== ChannelType.GuildStageVoice)
+                if (channel?.type !== discord_js_1.ChannelType.GuildStageVoice)
                     return null;
                 return channel;
             },
-            [ArgumentTypes.STAGE_CHANNELS]: (message, phrase) => {
+            [Constants_js_1.ArgumentTypes.STAGE_CHANNELS]: (message, phrase) => {
                 if (!phrase)
                     return null;
                 if (!message.inGuild())
@@ -294,12 +296,12 @@ export default class TypeResolver {
                 const channels = this.client.util.resolveChannels(phrase, message.guild.channels.cache);
                 if (!channels.size)
                     return null;
-                const storeChannels = channels.filter((c) => c.type === ChannelType.GuildStageVoice);
+                const storeChannels = channels.filter((c) => c.type === discord_js_1.ChannelType.GuildStageVoice);
                 return storeChannels.size
                     ? storeChannels
                     : null;
             },
-            [ArgumentTypes.THREAD_CHANNEL]: (message, phrase) => {
+            [Constants_js_1.ArgumentTypes.THREAD_CHANNEL]: (message, phrase) => {
                 if (!phrase)
                     return null;
                 if (!message.inGuild())
@@ -309,7 +311,7 @@ export default class TypeResolver {
                     return null;
                 return channel;
             },
-            [ArgumentTypes.THREAD_CHANNELS]: (message, phrase) => {
+            [Constants_js_1.ArgumentTypes.THREAD_CHANNELS]: (message, phrase) => {
                 if (!phrase)
                     return null;
                 if (!message.inGuild())
@@ -322,14 +324,14 @@ export default class TypeResolver {
                     ? storeChannels
                     : null;
             },
-            [ArgumentTypes.ROLE]: (message, phrase) => {
+            [Constants_js_1.ArgumentTypes.ROLE]: (message, phrase) => {
                 if (!phrase)
                     return null;
                 if (!message.inGuild())
                     return null;
                 return this.client.util.resolveRole(phrase, message.guild.roles.cache);
             },
-            [ArgumentTypes.ROLES]: (message, phrase) => {
+            [Constants_js_1.ArgumentTypes.ROLES]: (message, phrase) => {
                 if (!phrase)
                     return null;
                 if (!message.inGuild())
@@ -337,14 +339,14 @@ export default class TypeResolver {
                 const roles = this.client.util.resolveRoles(phrase, message.guild.roles.cache);
                 return roles.size ? roles : null;
             },
-            [ArgumentTypes.EMOJI]: (message, phrase) => {
+            [Constants_js_1.ArgumentTypes.EMOJI]: (message, phrase) => {
                 if (!phrase)
                     return null;
                 if (!message.inGuild())
                     return null;
                 return this.client.util.resolveEmoji(phrase, message.guild.emojis.cache);
             },
-            [ArgumentTypes.EMOJIS]: (message, phrase) => {
+            [Constants_js_1.ArgumentTypes.EMOJIS]: (message, phrase) => {
                 if (!phrase)
                     return null;
                 if (!message.inGuild())
@@ -352,18 +354,18 @@ export default class TypeResolver {
                 const emojis = this.client.util.resolveEmojis(phrase, message.guild.emojis.cache);
                 return emojis.size ? emojis : null;
             },
-            [ArgumentTypes.GUILD]: (_message, phrase) => {
+            [Constants_js_1.ArgumentTypes.GUILD]: (_message, phrase) => {
                 if (!phrase)
                     return null;
                 return this.client.util.resolveGuild(phrase, this.client.guilds.cache);
             },
-            [ArgumentTypes.GUILDS]: (_message, phrase) => {
+            [Constants_js_1.ArgumentTypes.GUILDS]: (_message, phrase) => {
                 if (!phrase)
                     return null;
                 const guilds = this.client.util.resolveGuilds(phrase, this.client.guilds.cache);
                 return guilds.size ? guilds : null;
             },
-            [ArgumentTypes.MESSAGE]: (message, phrase) => {
+            [Constants_js_1.ArgumentTypes.MESSAGE]: (message, phrase) => {
                 if (!phrase)
                     return null;
                 try {
@@ -373,7 +375,7 @@ export default class TypeResolver {
                     return null;
                 }
             },
-            [ArgumentTypes.GUILD_MESSAGE]: async (message, phrase) => {
+            [Constants_js_1.ArgumentTypes.GUILD_MESSAGE]: async (message, phrase) => {
                 if (!phrase)
                     return null;
                 if (!message.inGuild())
@@ -391,7 +393,7 @@ export default class TypeResolver {
                 }
                 return null;
             },
-            [ArgumentTypes.RELEVANT_MESSAGE]: async (message, phrase) => {
+            [Constants_js_1.ArgumentTypes.RELEVANT_MESSAGE]: async (message, phrase) => {
                 if (!phrase)
                     return null;
                 const hereMsg = await message.channel.messages
@@ -415,7 +417,7 @@ export default class TypeResolver {
                 }
                 return null;
             },
-            [ArgumentTypes.INVITE]: (_message, phrase) => {
+            [Constants_js_1.ArgumentTypes.INVITE]: (_message, phrase) => {
                 if (!phrase)
                     return null;
                 try {
@@ -425,7 +427,7 @@ export default class TypeResolver {
                     return null;
                 }
             },
-            [ArgumentTypes.USER_MENTION]: (_message, phrase) => {
+            [Constants_js_1.ArgumentTypes.USER_MENTION]: (_message, phrase) => {
                 if (!phrase)
                     return null;
                 const id = phrase.match(/<@!?(\d{17,19})>/);
@@ -433,7 +435,7 @@ export default class TypeResolver {
                     return null;
                 return this.client.users.cache.get(id[1]) ?? null;
             },
-            [ArgumentTypes.MEMBER_MENTION]: (message, phrase) => {
+            [Constants_js_1.ArgumentTypes.MEMBER_MENTION]: (message, phrase) => {
                 if (!phrase)
                     return null;
                 if (!message.inGuild())
@@ -443,7 +445,7 @@ export default class TypeResolver {
                     return null;
                 return message.guild.members.cache.get(id[1]) ?? null;
             },
-            [ArgumentTypes.CHANNEL_MENTION]: (message, phrase) => {
+            [Constants_js_1.ArgumentTypes.CHANNEL_MENTION]: (message, phrase) => {
                 if (!phrase)
                     return null;
                 if (!message.inGuild())
@@ -453,7 +455,7 @@ export default class TypeResolver {
                     return null;
                 return message.guild.channels.cache.get(id[1]) ?? null;
             },
-            [ArgumentTypes.ROLE_MENTION]: (message, phrase) => {
+            [Constants_js_1.ArgumentTypes.ROLE_MENTION]: (message, phrase) => {
                 if (!phrase)
                     return null;
                 if (!message.guild)
@@ -463,7 +465,7 @@ export default class TypeResolver {
                     return null;
                 return message.guild.roles.cache.get(id[1]) ?? null;
             },
-            [ArgumentTypes.EMOJI_MENTION]: (message, phrase) => {
+            [Constants_js_1.ArgumentTypes.EMOJI_MENTION]: (message, phrase) => {
                 if (!phrase)
                     return null;
                 if (!message.inGuild())
@@ -473,27 +475,27 @@ export default class TypeResolver {
                     return null;
                 return message.guild.emojis.cache.get(id[1]) ?? null;
             },
-            [ArgumentTypes.COMMAND_ALIAS]: (_message, phrase) => {
+            [Constants_js_1.ArgumentTypes.COMMAND_ALIAS]: (_message, phrase) => {
                 if (!phrase)
                     return null;
                 return this.commandHandler.findCommand(phrase) ?? null;
             },
-            [ArgumentTypes.COMMAND]: (_message, phrase) => {
+            [Constants_js_1.ArgumentTypes.COMMAND]: (_message, phrase) => {
                 if (!phrase)
                     return null;
                 return this.commandHandler.modules.get(phrase) ?? null;
             },
-            [ArgumentTypes.INHIBITOR]: (_message, phrase) => {
+            [Constants_js_1.ArgumentTypes.INHIBITOR]: (_message, phrase) => {
                 if (!phrase)
                     return null;
                 return this.inhibitorHandler?.modules.get(phrase) ?? null;
             },
-            [ArgumentTypes.LISTENER]: (_message, phrase) => {
+            [Constants_js_1.ArgumentTypes.LISTENER]: (_message, phrase) => {
                 if (!phrase)
                     return null;
                 return this.listenerHandler?.modules.get(phrase) ?? null;
             },
-            [ArgumentTypes.CONTEXT_MENU_COMMAND]: (_message, phrase) => {
+            [Constants_js_1.ArgumentTypes.CONTEXT_MENU_COMMAND]: (_message, phrase) => {
                 if (!phrase)
                     return null;
                 return (this.contextMenuCommandHandler?.modules.get(phrase) ?? null);
@@ -526,4 +528,5 @@ export default class TypeResolver {
         return this;
     }
 }
+exports.default = TypeResolver;
 //# sourceMappingURL=TypeResolver.js.map

@@ -1,7 +1,9 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * Base class for a module.
  */
-export default class AkairoModule {
+class AkairoModule {
     /**
      * @param id - ID of module.
      * @param options - Options.
@@ -34,4 +36,5 @@ export default class AkairoModule {
         return this.id;
     }
 }
+exports.default = AkairoModule;
 //# sourceMappingURL=AkairoModule.js.map

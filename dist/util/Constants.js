@@ -1,4 +1,7 @@
-export const ArgumentMatches = Object.freeze({
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.BuiltInReasons = exports.ContextCommandHandlerEvents = exports.SlashCommandHandlerEvents = exports.CommandHandlerEvents = exports.AkairoHandlerEvents = exports.ArgumentTypes = exports.ArgumentMatches = void 0;
+exports.ArgumentMatches = Object.freeze({
     PHRASE: 'phrase',
     FLAG: 'flag',
     OPTION: 'option',
@@ -9,7 +12,7 @@ export const ArgumentMatches = Object.freeze({
     REST_CONTENT: 'restContent',
     NONE: 'none',
 });
-export const ArgumentTypes = Object.freeze({
+exports.ArgumentTypes = Object.freeze({
     STRING: 'string',
     LOWERCASE: 'lowercase',
     UPPERCASE: 'uppercase',
@@ -64,11 +67,11 @@ export const ArgumentTypes = Object.freeze({
     LISTENER: 'listener',
     CONTEXT_MENU_COMMAND: 'contextMenuCommand',
 });
-export const AkairoHandlerEvents = Object.freeze({
+exports.AkairoHandlerEvents = Object.freeze({
     LOAD: 'load',
     REMOVE: 'remove',
 });
-export const CommandHandlerEvents = Object.freeze({
+exports.CommandHandlerEvents = Object.freeze({
     COMMAND_BLOCKED: 'commandBlocked',
     COMMAND_BREAKOUT: 'commandBreakout',
     COMMAND_CANCELLED: 'commandCancelled',
@@ -90,7 +93,7 @@ export const CommandHandlerEvents = Object.freeze({
     SLASH_STARTED: 'slashStarted',
     SLASH_ONLY: 'slashOnly',
 });
-export const SlashCommandHandlerEvents = Object.freeze({
+exports.SlashCommandHandlerEvents = Object.freeze({
     SLASH_COMMAND_BLOCKED: 'slashCommandBlocked',
     SLASH_COMMAND_FINISHED: 'slashCommandFinished',
     SLASH_COMMAND_LOCKED: 'slashCommandLocked',
@@ -101,14 +104,14 @@ export const SlashCommandHandlerEvents = Object.freeze({
     SLASH_MESSAGE_BLOCKED: 'slashMessageBlocked',
     SLASH_MISSING_PERMISSIONS: 'slashMissingPermissions',
 });
-export const ContextCommandHandlerEvents = Object.freeze({
+exports.ContextCommandHandlerEvents = Object.freeze({
     ERROR: 'error',
     FINISHED: 'finished',
     NOT_FOUND: 'notFound',
     STARTED: 'started',
     BLOCKED: 'blocked',
 });
-export const BuiltInReasons = Object.freeze({
+exports.BuiltInReasons = Object.freeze({
     CLIENT: 'client',
     BOT: 'bot',
     OWNER: 'owner',

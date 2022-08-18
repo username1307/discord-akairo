@@ -1,6 +1,11 @@
-import AkairoError from '../../util/AkairoError';
-import AkairoModule from '../AkairoModule';
-export default class SlashCommand extends AkairoModule {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const AkairoError_1 = __importDefault(require("../../util/AkairoError"));
+const AkairoModule_1 = __importDefault(require("../AkairoModule"));
+class SlashCommand extends AkairoModule_1.default {
     constructor(id, options) {
         super(id, { category: options?.category });
         const { before = this.before || (() => undefined), channel = null, clientPermissions = this.clientPermissions, description, guarded = false, hidden = false, ignorePermissions, lock, name, ownerOnly = false, parentCommand, prefixId, shortName, slashDefaultPermission, slashOptions = [], commandType, userPermissions = this.userPermissions, } = options ?? {};
@@ -42,8 +47,9 @@ export default class SlashCommand extends AkairoModule {
     }
     before(message) { }
     exec(interaction, message, ...args) {
-        throw new AkairoError('NOT_IMPLEMENTED', this.constructor.name, 'exec');
+        throw new AkairoError_1.default('NOT_IMPLEMENTED', this.constructor.name, 'exec');
     }
     autocomplete(interaction) { }
 }
+exports.default = SlashCommand;
 //# sourceMappingURL=SlashCommand.js.map

@@ -1,8 +1,10 @@
-import { ActivityType, AttachmentBuilder, Collection, EmbedBuilder, PermissionsBitField, } from 'discord.js';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const discord_js_1 = require("discord.js");
 /**
  * Client utilities to help with common tasks.
  */
-export default class ClientUtil {
+class ClientUtil {
     /**
      * @param client - The client.
      */
@@ -15,7 +17,7 @@ export default class ClientUtil {
      * @param data - The filename.
      */
     attachment(file, data) {
-        return new AttachmentBuilder(file, data);
+        return new discord_js_1.AttachmentBuilder(file, data);
     }
     /**
      * Checks if a string could be referring to a channel.
@@ -163,7 +165,7 @@ export default class ClientUtil {
      * @param iterable - Entries to fill with.
      */
     collection(iterable) {
-        return new Collection(iterable);
+        return new discord_js_1.Collection(iterable);
     }
     /**
      * Compares two member objects presences and checks if they stopped or started a stream or not.
@@ -172,8 +174,8 @@ export default class ClientUtil {
      * @param newMember - The new member.
      */
     compareStreaming(oldMember, newMember) {
-        const s1 = oldMember.presence?.activities.find((c) => c.type === ActivityType.Streaming);
-        const s2 = newMember.presence?.activities.find((c) => c.type === ActivityType.Streaming);
+        const s1 = oldMember.presence?.activities.find((c) => c.type === discord_js_1.ActivityType.Streaming);
+        const s2 = newMember.presence?.activities.find((c) => c.type === discord_js_1.ActivityType.Streaming);
         if (s1 === s2)
             return 0;
         if (s1)
@@ -187,7 +189,7 @@ export default class ClientUtil {
      * @param data - Embed data.
      */
     embed(data) {
-        return new EmbedBuilder(data);
+        return new discord_js_1.EmbedBuilder(data);
     }
     /**
      * Combination of `<Client>.fetchUser()` and `<Guild>.fetchMember()`.
@@ -203,7 +205,7 @@ export default class ClientUtil {
      * Array of permission names.
      */
     permissionNames() {
-        return Object.keys(PermissionsBitField.Flags);
+        return Object.keys(discord_js_1.PermissionsBitField.Flags);
     }
     /**
      * Resolves a channel from a string, such as an ID, a name, or a mention.
@@ -299,9 +301,9 @@ export default class ClientUtil {
      */
     resolvePermissionNumber(number) {
         const resolved = [];
-        for (const key of Object.keys(PermissionsBitField.Flags)) {
+        for (const key of Object.keys(discord_js_1.PermissionsBitField.Flags)) {
             if (BigInt(number) &&
-                PermissionsBitField.Flags[key])
+                discord_js_1.PermissionsBitField.Flags[key])
                 resolved.push(key);
         }
         return resolved;
@@ -351,4 +353,5 @@ export default class ClientUtil {
         return users.filter((user) => this.checkUser(text, user, caseSensitive, wholeWord));
     }
 }
+exports.default = ClientUtil;
 //# sourceMappingURL=ClientUtil.js.map

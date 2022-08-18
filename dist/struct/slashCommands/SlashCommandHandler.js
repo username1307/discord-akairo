@@ -1,17 +1,22 @@
-import { ApplicationCommandOptionType, ChannelType, Collection, InteractionType, } from 'discord.js';
-import AkairoError from '../../util/AkairoError';
-import AkairoMessage from '../../util/AkairoMessage';
-import { BuiltInReasons, SlashCommandHandlerEvents, } from '../../util/Constants';
-import Util from '../../util/Util';
-import AkairoHandler from '../AkairoHandler';
-import TypeResolver from '../messageCommands/arguments/TypeResolver';
-import SlashCommand from './SlashCommand';
-export default class SlashCommandHandler extends AkairoHandler {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const discord_js_1 = require("discord.js");
+const AkairoError_1 = __importDefault(require("../../util/AkairoError"));
+const AkairoMessage_1 = __importDefault(require("../../util/AkairoMessage"));
+const Constants_1 = require("../../util/Constants");
+const Util_1 = __importDefault(require("../../util/Util"));
+const AkairoHandler_1 = __importDefault(require("../AkairoHandler"));
+const TypeResolver_1 = __importDefault(require("../messageCommands/arguments/TypeResolver"));
+const SlashCommand_1 = __importDefault(require("./SlashCommand"));
+class SlashCommandHandler extends AkairoHandler_1.default {
     constructor(client, options) {
-        const { directory, classToHandle = SlashCommand, extensions = ['.js', '.ts'], automateCategories, loadFilter, blockClient = true, blockBots = true, ignorePermissions = [], skipBuiltInPostInhibitors = false, } = options ?? {};
-        if (!(classToHandle.prototype instanceof SlashCommand ||
-            classToHandle === SlashCommand)) {
-            throw new AkairoError('INVALID_CLASS_TO_HANDLE', classToHandle.name, SlashCommand.name);
+        const { directory, classToHandle = SlashCommand_1.default, extensions = ['.js', '.ts'], automateCategories, loadFilter, blockClient = true, blockBots = true, ignorePermissions = [], skipBuiltInPostInhibitors = false, } = options ?? {};
+        if (!(classToHandle.prototype instanceof SlashCommand_1.default ||
+            classToHandle === SlashCommand_1.default)) {
+            throw new AkairoError_1.default('INVALID_CLASS_TO_HANDLE', classToHandle.name, SlashCommand_1.default.name);
         }
         super(client, {
             directory,
@@ -20,8 +25,8 @@ export default class SlashCommandHandler extends AkairoHandler {
             automateCategories,
             loadFilter,
         });
-        this.resolver = new TypeResolver(this);
-        this.names = new Collection();
+        this.resolver = new TypeResolver_1.default(this);
+        this.names = new discord_js_1.Collection();
         this.blockClient = Boolean(blockClient);
         this.blockBots = Boolean(blockBots);
         this.ignorePermissions =
@@ -37,7 +42,7 @@ export default class SlashCommandHandler extends AkairoHandler {
             this.client.on('interactionCreate', (i) => {
                 if (i.isChatInputCommand())
                     void this.handleSlash(i);
-                if (i.type === InteractionType.ApplicationCommandAutocomplete)
+                if (i.type === discord_js_1.InteractionType.ApplicationCommandAutocomplete)
                     this.handleAutocomplete(i);
             });
         });
@@ -46,7 +51,7 @@ export default class SlashCommandHandler extends AkairoHandler {
         super.register(command, filepath);
         const conflict = this.names.get(command.name.toLowerCase());
         if (conflict)
-            throw new AkairoError('ALIAS_CONFLICT', command.name, command.id, conflict);
+            throw new AkairoError_1.default('ALIAS_CONFLICT', command.name, command.id, conflict);
         const name = command.name.toLowerCase();
         this.names.set(name, command.id);
     }
@@ -63,10 +68,10 @@ export default class SlashCommandHandler extends AkairoHandler {
             commandName += ` ${interaction.options.getSubcommand()}`;
         const commandModule = this.findCommand(commandName);
         if (!commandModule) {
-            this.emit(SlashCommandHandlerEvents.SLASH_COMMAND_NOT_FOUND, interaction);
+            this.emit(Constants_1.SlashCommandHandlerEvents.SLASH_COMMAND_NOT_FOUND, interaction);
             return false;
         }
-        const message = new AkairoMessage(this.client, interaction);
+        const message = new AkairoMessage_1.default(this.client, interaction);
         try {
             if (await this.runAllTypeInhibitors(message)) {
                 return false;
@@ -84,11 +89,11 @@ export default class SlashCommandHandler extends AkairoHandler {
                 convertedOptions['subcommand'] = interaction.options['_subcommand'];
             for (const option of interaction.options['_hoistedOptions']) {
                 if ([
-                    ApplicationCommandOptionType.Subcommand,
-                    ApplicationCommandOptionType.SubcommandGroup,
+                    discord_js_1.ApplicationCommandOptionType.Subcommand,
+                    discord_js_1.ApplicationCommandOptionType.SubcommandGroup,
                 ].includes(option.type))
                     continue;
-                convertedOptions[option.name] = interaction.options[Util.snakeToCamelCase(`GET_${ApplicationCommandOptionType[option.type].toUpperCase()}`)](option.name, false);
+                convertedOptions[option.name] = interaction.options[Util_1.default.snakeToCamelCase(`GET_${discord_js_1.ApplicationCommandOptionType[option.type].toUpperCase()}`)](option.name, false);
             }
             // Make options that are not found to be null so that it matches the behavior normal messageCommands.
             (() => {
@@ -96,9 +101,9 @@ export default class SlashCommandHandler extends AkairoHandler {
                     convertedOptions.subcommandGroup) {
                     const usedSubcommandOrGroup = commandModule.slashOptions?.find((o) => o.name === convertedOptions.subcommand &&
                         [
-                            ApplicationCommandOptionType.Subcommand,
+                            discord_js_1.ApplicationCommandOptionType.Subcommand,
                             'SUB_COMMAND',
-                            ApplicationCommandOptionType.SubcommandGroup,
+                            discord_js_1.ApplicationCommandOptionType.SubcommandGroup,
                             'SUB_COMMAND_GROUP',
                         ].includes(o.type));
                     if (!usedSubcommandOrGroup) {
@@ -106,7 +111,7 @@ export default class SlashCommandHandler extends AkairoHandler {
                         return;
                     }
                     if ([
-                        ApplicationCommandOptionType.Subcommand,
+                        discord_js_1.ApplicationCommandOptionType.Subcommand,
                         'SUB_COMMAND',
                     ].includes(usedSubcommandOrGroup.type)) {
                         if (!usedSubcommandOrGroup.options) {
@@ -116,7 +121,7 @@ export default class SlashCommandHandler extends AkairoHandler {
                         handleOptions(usedSubcommandOrGroup.options);
                     }
                     else if ([
-                        ApplicationCommandOptionType.SubcommandGroup,
+                        discord_js_1.ApplicationCommandOptionType.SubcommandGroup,
                         'SUB_COMMAND_GROUP',
                     ].includes(usedSubcommandOrGroup.type)) {
                         const usedSubCommand = usedSubcommandOrGroup.options?.find((subcommand) => subcommand.name === convertedOptions.subcommand);
@@ -143,17 +148,17 @@ export default class SlashCommandHandler extends AkairoHandler {
                         if (!Reflect.has(convertedOptions, option.name) ||
                             convertedOptions[option.name] === undefined) {
                             switch (option.type) {
-                                case ApplicationCommandOptionType.Boolean:
+                                case discord_js_1.ApplicationCommandOptionType.Boolean:
                                     convertedOptions[option.name] = false;
                                     break;
-                                case ApplicationCommandOptionType.Channel:
-                                case ApplicationCommandOptionType.Integer:
-                                case ApplicationCommandOptionType.Mentionable:
-                                case ApplicationCommandOptionType.Number:
-                                case ApplicationCommandOptionType.Role:
-                                case ApplicationCommandOptionType.String:
-                                case ApplicationCommandOptionType.User:
-                                case ApplicationCommandOptionType.Attachment:
+                                case discord_js_1.ApplicationCommandOptionType.Channel:
+                                case discord_js_1.ApplicationCommandOptionType.Integer:
+                                case discord_js_1.ApplicationCommandOptionType.Mentionable:
+                                case discord_js_1.ApplicationCommandOptionType.Number:
+                                case discord_js_1.ApplicationCommandOptionType.Role:
+                                case discord_js_1.ApplicationCommandOptionType.String:
+                                case discord_js_1.ApplicationCommandOptionType.User:
+                                case discord_js_1.ApplicationCommandOptionType.Attachment:
                                 default:
                                     convertedOptions[option.name] = null;
                                     break;
@@ -166,12 +171,12 @@ export default class SlashCommandHandler extends AkairoHandler {
             try {
                 if (commandModule.lock)
                     key = commandModule.lock(message, convertedOptions);
-                if (Util.isPromise(key))
+                if (Util_1.default.isPromise(key))
                     key = await key;
                 if (key) {
                     if (commandModule.locker?.has(key)) {
                         key = null;
-                        this.emit(SlashCommandHandlerEvents.SLASH_COMMAND_LOCKED, message, commandModule);
+                        this.emit(Constants_1.SlashCommandHandlerEvents.SLASH_COMMAND_LOCKED, message, commandModule);
                         return true;
                     }
                     commandModule.locker?.add(key);
@@ -185,13 +190,13 @@ export default class SlashCommandHandler extends AkairoHandler {
                     commandModule.locker?.delete(key);
             }
             try {
-                this.emit(SlashCommandHandlerEvents.SLASH_COMMAND_STARTED, message, commandModule, convertedOptions);
+                this.emit(Constants_1.SlashCommandHandlerEvents.SLASH_COMMAND_STARTED, message, commandModule, convertedOptions);
                 const ret = await commandModule.exec(interaction, message, convertedOptions);
-                this.emit(SlashCommandHandlerEvents.SLASH_COMMAND_FINISHED, message, commandModule, convertedOptions, ret);
+                this.emit(Constants_1.SlashCommandHandlerEvents.SLASH_COMMAND_FINISHED, message, commandModule, convertedOptions, ret);
                 return true;
             }
             catch (err) {
-                this.emit(SlashCommandHandlerEvents.ERROR, err, message, commandModule);
+                this.emit(Constants_1.SlashCommandHandlerEvents.ERROR, err, message, commandModule);
                 return false;
             }
         }
@@ -208,7 +213,7 @@ export default class SlashCommandHandler extends AkairoHandler {
             commandName += ` ${interaction.options.getSubcommand()}`;
         const commandModule = this.findCommand(commandName);
         if (!commandModule) {
-            this.emit(SlashCommandHandlerEvents.SLASH_COMMAND_NOT_FOUND, interaction);
+            this.emit(Constants_1.SlashCommandHandlerEvents.SLASH_COMMAND_NOT_FOUND, interaction);
             return;
         }
         this.client.emit('AkairoDebug', `Autocomplete started for ${interaction.commandName}`);
@@ -219,17 +224,17 @@ export default class SlashCommandHandler extends AkairoHandler {
             ? await this.inhibitorHandler.test('all', message)
             : null;
         if (reason != null) {
-            this.emit(SlashCommandHandlerEvents.MESSAGE_BLOCKED, message, reason);
+            this.emit(Constants_1.SlashCommandHandlerEvents.MESSAGE_BLOCKED, message, reason);
         }
         else if (!message.author) {
-            this.emit(SlashCommandHandlerEvents.MESSAGE_BLOCKED, message, BuiltInReasons.AUTHOR_NOT_FOUND);
+            this.emit(Constants_1.SlashCommandHandlerEvents.MESSAGE_BLOCKED, message, Constants_1.BuiltInReasons.AUTHOR_NOT_FOUND);
         }
         else if (this.blockClient &&
             message.author.id === this.client.user?.id) {
-            this.emit(SlashCommandHandlerEvents.MESSAGE_BLOCKED, message, BuiltInReasons.CLIENT);
+            this.emit(Constants_1.SlashCommandHandlerEvents.MESSAGE_BLOCKED, message, Constants_1.BuiltInReasons.CLIENT);
         }
         else if (this.blockBots && message.author.bot) {
-            this.emit(SlashCommandHandlerEvents.MESSAGE_BLOCKED, message, BuiltInReasons.BOT);
+            this.emit(Constants_1.SlashCommandHandlerEvents.MESSAGE_BLOCKED, message, Constants_1.BuiltInReasons.BOT);
         }
         else {
             return false;
@@ -241,7 +246,7 @@ export default class SlashCommandHandler extends AkairoHandler {
             ? await this.inhibitorHandler.test('pre', message)
             : null;
         if (reason != null) {
-            this.emit(SlashCommandHandlerEvents.MESSAGE_BLOCKED, message, reason);
+            this.emit(Constants_1.SlashCommandHandlerEvents.MESSAGE_BLOCKED, message, reason);
         }
         else {
             return false;
@@ -249,21 +254,21 @@ export default class SlashCommandHandler extends AkairoHandler {
         return true;
     }
     async runPostTypeInhibitors(message, command) {
-        const event = SlashCommandHandlerEvents.SLASH_COMMAND_BLOCKED;
+        const event = Constants_1.SlashCommandHandlerEvents.SLASH_COMMAND_BLOCKED;
         if (!this.skipBuiltInPostInhibitors) {
             if (command.ownerOnly) {
                 const isOwner = this.client.isOwner(message.author);
                 if (!isOwner) {
-                    this.emit(event, message, command, BuiltInReasons.OWNER);
+                    this.emit(event, message, command, Constants_1.BuiltInReasons.OWNER);
                     return true;
                 }
             }
             if (command.channel === 'guild' && !message.guild) {
-                this.emit(event, message, command, BuiltInReasons.GUILD);
+                this.emit(event, message, command, Constants_1.BuiltInReasons.GUILD);
                 return true;
             }
             if (command.channel === 'dm' && message.guild) {
-                this.emit(event, message, command, BuiltInReasons.DM);
+                this.emit(event, message, command, Constants_1.BuiltInReasons.DM);
                 return true;
             }
         }
@@ -287,11 +292,11 @@ export default class SlashCommandHandler extends AkairoHandler {
         return false;
     }
     async runPermissionChecks(message, command) {
-        const event = SlashCommandHandlerEvents.SLASH_MISSING_PERMISSIONS;
+        const event = Constants_1.SlashCommandHandlerEvents.SLASH_MISSING_PERMISSIONS;
         if (command.clientPermissions) {
             if (typeof command.clientPermissions === 'function') {
                 let missing = command.clientPermissions(message);
-                if (Util.isPromise(missing))
+                if (Util_1.default.isPromise(missing))
                     missing = await missing;
                 if (missing != null) {
                     this.emit(event, message, command, 'client', missing);
@@ -299,7 +304,7 @@ export default class SlashCommandHandler extends AkairoHandler {
                 }
             }
             else if (message.guild) {
-                if (message.channel?.type === ChannelType.DM)
+                if (message.channel?.type === discord_js_1.ChannelType.DM)
                     return false;
                 const missing = message.channel
                     ?.permissionsFor(message.guild.members.me)
@@ -320,7 +325,7 @@ export default class SlashCommandHandler extends AkairoHandler {
             if (!isIgnored) {
                 if (typeof command.userPermissions === 'function') {
                     let missing = command.userPermissions(message);
-                    if (Util.isPromise(missing))
+                    if (Util_1.default.isPromise(missing))
                         missing = await missing;
                     if (missing != null) {
                         this.emit(event, message, command, 'user', missing);
@@ -328,7 +333,7 @@ export default class SlashCommandHandler extends AkairoHandler {
                     }
                 }
                 else if (message.guild) {
-                    if (message.channel?.type === ChannelType.DM)
+                    if (message.channel?.type === discord_js_1.ChannelType.DM)
                         return false;
                     const missing = message.channel
                         ?.permissionsFor(message.author)
@@ -343,8 +348,8 @@ export default class SlashCommandHandler extends AkairoHandler {
         return false;
     }
     emitError(err, message, command) {
-        if (this.listenerCount(SlashCommandHandlerEvents.ERROR)) {
-            this.emit(SlashCommandHandlerEvents.ERROR, err, message, command);
+        if (this.listenerCount(Constants_1.SlashCommandHandlerEvents.ERROR)) {
+            this.emit(Constants_1.SlashCommandHandlerEvents.ERROR, err, message, command);
             return;
         }
         throw err;
@@ -366,4 +371,5 @@ export default class SlashCommandHandler extends AkairoHandler {
         return this;
     }
 }
+exports.default = SlashCommandHandler;
 //# sourceMappingURL=SlashCommandHandler.js.map

@@ -1,8 +1,10 @@
-import { Collection } from 'discord.js';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const discord_js_1 = require("discord.js");
 /**
  * A group of modules.
  */
-export default class Category extends Collection {
+class Category extends discord_js_1.Collection {
     /**
      * @param id - ID of the category.
      * @param iterable - Entries to set.
@@ -38,4 +40,5 @@ export default class Category extends Collection {
         return this.id;
     }
 }
+exports.default = Category;
 //# sourceMappingURL=Category.js.map

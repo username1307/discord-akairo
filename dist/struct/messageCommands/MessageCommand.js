@@ -1,12 +1,17 @@
-import AkairoError from '../../util/AkairoError.js';
-import AkairoModule from '../AkairoModule.js';
-import Argument from './arguments/Argument.js';
-import ArgumentRunner from './arguments/ArgumentRunner.js';
-import ContentParser from './ContentParser.js';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const AkairoError_js_1 = __importDefault(require("../../util/AkairoError.js"));
+const AkairoModule_js_1 = __importDefault(require("../AkairoModule.js"));
+const Argument_js_1 = __importDefault(require("./arguments/Argument.js"));
+const ArgumentRunner_js_1 = __importDefault(require("./arguments/ArgumentRunner.js"));
+const ContentParser_js_1 = __importDefault(require("./ContentParser.js"));
 /**
  * Represents a command.
  */
-export default class MessageCommand extends AkairoModule {
+class MessageCommand extends AkairoModule_js_1.default {
     /**
      * @param id - MessageCommand ID.
      * @param options - Options for the command.
@@ -16,17 +21,17 @@ export default class MessageCommand extends AkairoModule {
         const { aliases = [], args = this._args || this.args || [], argumentDefaults = {}, before = this.before || (() => undefined), channel = null, clientPermissions = this.clientPermissions, condition = this.condition || (() => false), cooldown = null, description = '', editable = true, flags = [], ignoreCooldown, ignorePermissions, lock, optionFlags = [], ownerOnly = false, prefix = this.prefix, quoted = true, ratelimit = 1, regex = this.regex, separator, superUserOnly = false, typing = false, userPermissions = this.userPermissions, } = options ?? {};
         this.aliases = aliases;
         const { flagWords, optionFlagWords } = Array.isArray(args)
-            ? ContentParser.getFlags(args)
+            ? ContentParser_js_1.default.getFlags(args)
             : { flagWords: flags, optionFlagWords: optionFlags };
-        this.contentParser = new ContentParser({
+        this.contentParser = new ContentParser_js_1.default({
             flagWords,
             optionFlagWords,
             quoted,
             separator,
         });
-        this.argumentRunner = new ArgumentRunner(this);
+        this.argumentRunner = new ArgumentRunner_js_1.default(this);
         this.argumentGenerator = (Array.isArray(args)
-            ? ArgumentRunner.fromArguments(args.map((arg) => [arg.id, new Argument(this, arg)]))
+            ? ArgumentRunner_js_1.default.fromArguments(args.map((arg) => [arg.id, new Argument_js_1.default(this, arg)]))
             : args.bind(this));
         this.argumentDefaults = argumentDefaults;
         this.before = before.bind(this);
@@ -92,7 +97,7 @@ export default class MessageCommand extends AkairoModule {
         return false;
     }
     exec(message, args) {
-        throw new AkairoError('NOT_IMPLEMENTED', this.constructor.name, 'exec');
+        throw new AkairoError_js_1.default('NOT_IMPLEMENTED', this.constructor.name, 'exec');
     }
     /**
      * Respond to autocomplete interactions for this command.
@@ -109,4 +114,5 @@ export default class MessageCommand extends AkairoModule {
         return this.argumentRunner.run(message, parsed, this.argumentGenerator);
     }
 }
+exports.default = MessageCommand;
 //# sourceMappingURL=MessageCommand.js.map

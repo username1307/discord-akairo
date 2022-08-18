@@ -1,8 +1,10 @@
-import { Base, ApplicationCommandOptionType, cleanContent, } from 'discord.js';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const discord_js_1 = require("discord.js");
 /**
  * A command interaction represented as a message.
  */
-export default class AkairoMessage extends Base {
+class AkairoMessage extends discord_js_1.Base {
     /**
      * @param client - AkairoClient
      * @param interaction - CommandInteraction
@@ -27,8 +29,8 @@ export default class AkairoMessage extends Base {
                 this.content += `subcommand: ${options['_subcommand']}`;
             for (const option of options['_hoistedOptions']) {
                 if ([
-                    ApplicationCommandOptionType.Subcommand,
-                    ApplicationCommandOptionType.SubcommandGroup,
+                    discord_js_1.ApplicationCommandOptionType.Subcommand,
+                    discord_js_1.ApplicationCommandOptionType.SubcommandGroup,
                 ].includes(option.type))
                     continue;
                 this.content += ` ${option.name}: ${options.get(option.name, false)?.value}`;
@@ -53,7 +55,7 @@ export default class AkairoMessage extends Base {
      */
     get cleanContent() {
         return this.content != null
-            ? cleanContent(this.content, this.channel)
+            ? (0, discord_js_1.cleanContent)(this.content, this.channel)
             : null;
     }
     /**
@@ -96,4 +98,5 @@ export default class AkairoMessage extends Base {
         return this.util.reply(options);
     }
 }
+exports.default = AkairoMessage;
 //# sourceMappingURL=AkairoMessage.js.map

@@ -1,11 +1,16 @@
-import AkairoError from '../../../util/AkairoError.js';
-import { ArgumentMatches } from '../../../util/Constants.js';
-import Flag from '../Flag.js';
-import Argument from './Argument.js';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const AkairoError_js_1 = __importDefault(require("../../../util/AkairoError.js"));
+const Constants_js_1 = require("../../../util/Constants.js");
+const Flag_js_1 = __importDefault(require("../Flag.js"));
+const Argument_js_1 = __importDefault(require("./Argument.js"));
 /**
  * Runs arguments.
  */
-export default class ArgumentRunner {
+class ArgumentRunner {
     /**
      * @param command - MessageCommand to run for.
      */
@@ -37,7 +42,7 @@ export default class ArgumentRunner {
             index: 0,
         };
         const augmentRest = (val) => {
-            if (Flag.is(val, 'continue')) {
+            if (Flag_js_1.default.is(val, 'continue')) {
                 val.rest = parsed.all
                     .slice(state.index)
                     .map((x) => x.raw)
@@ -52,7 +57,7 @@ export default class ArgumentRunner {
                 augmentRest(value);
                 return value;
             }
-            const res = await this.runOne(message, parsed, state, new Argument(this.command, value));
+            const res = await this.runOne(message, parsed, state, new Argument_js_1.default(this.command, value));
             if (ArgumentRunner.isShortCircuit(res)) {
                 augmentRest(res);
                 return res;
@@ -71,19 +76,19 @@ export default class ArgumentRunner {
      */
     runOne(message, parsed, state, arg) {
         const cases = {
-            [ArgumentMatches.PHRASE]: this.runPhrase,
-            [ArgumentMatches.FLAG]: this.runFlag,
-            [ArgumentMatches.OPTION]: this.runOption,
-            [ArgumentMatches.REST]: this.runRest,
-            [ArgumentMatches.SEPARATE]: this.runSeparate,
-            [ArgumentMatches.TEXT]: this.runText,
-            [ArgumentMatches.CONTENT]: this.runContent,
-            [ArgumentMatches.REST_CONTENT]: this.runRestContent,
-            [ArgumentMatches.NONE]: this.runNone,
+            [Constants_js_1.ArgumentMatches.PHRASE]: this.runPhrase,
+            [Constants_js_1.ArgumentMatches.FLAG]: this.runFlag,
+            [Constants_js_1.ArgumentMatches.OPTION]: this.runOption,
+            [Constants_js_1.ArgumentMatches.REST]: this.runRest,
+            [Constants_js_1.ArgumentMatches.SEPARATE]: this.runSeparate,
+            [Constants_js_1.ArgumentMatches.TEXT]: this.runText,
+            [Constants_js_1.ArgumentMatches.CONTENT]: this.runContent,
+            [Constants_js_1.ArgumentMatches.REST_CONTENT]: this.runRestContent,
+            [Constants_js_1.ArgumentMatches.NONE]: this.runNone,
         };
         const runFn = cases[arg.match];
         if (runFn == null) {
-            throw new AkairoError('UNKNOWN_MATCH_TYPE', arg.match);
+            throw new AkairoError_js_1.default('UNKNOWN_MATCH_TYPE', arg.match);
         }
         return runFn.call(this, message, parsed, state, arg);
     }
@@ -163,7 +168,7 @@ export default class ArgumentRunner {
         const res = [];
         for (const phrase of phrases) {
             const response = await arg.process(message, phrase.value);
-            if (Flag.is(response, 'cancel')) {
+            if (Flag_js_1.default.is(response, 'cancel')) {
                 return response;
             }
             res.push(response);
@@ -295,9 +300,9 @@ export default class ArgumentRunner {
      * @param value - A value.
      */
     static isShortCircuit(value) {
-        return (Flag.is(value, 'cancel') ||
-            Flag.is(value, 'retry') ||
-            Flag.is(value, 'continue'));
+        return (Flag_js_1.default.is(value, 'cancel') ||
+            Flag_js_1.default.is(value, 'retry') ||
+            Flag_js_1.default.is(value, 'continue'));
     }
     /**
      * Creates an argument generator from argument options.
@@ -313,4 +318,5 @@ export default class ArgumentRunner {
         };
     }
 }
+exports.default = ArgumentRunner;
 //# sourceMappingURL=ArgumentRunner.js.map

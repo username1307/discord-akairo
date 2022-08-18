@@ -1,21 +1,26 @@
-import { Collection } from 'discord.js';
-import AkairoError from '../../util/AkairoError.js';
-import Util from '../../util/Util.js';
-import AkairoHandler from '../AkairoHandler.js';
-import Listener from './Listener.js';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const discord_js_1 = require("discord.js");
+const AkairoError_js_1 = __importDefault(require("../../util/AkairoError.js"));
+const Util_js_1 = __importDefault(require("../../util/Util.js"));
+const AkairoHandler_js_1 = __importDefault(require("../AkairoHandler.js"));
+const Listener_js_1 = __importDefault(require("./Listener.js"));
 /**
  * Loads listeners and registers them with EventEmitters.
  */
-export default class ListenerHandler extends AkairoHandler {
+class ListenerHandler extends AkairoHandler_js_1.default {
     /**
      * @param client - The Akairo client.
      * @param options - Options.
      */
     constructor(client, options) {
-        const { directory, classToHandle = Listener, extensions = ['.js', '.ts'], automateCategories, loadFilter, } = options ?? {};
-        if (!(classToHandle.prototype instanceof Listener ||
-            classToHandle === Listener)) {
-            throw new AkairoError('INVALID_CLASS_TO_HANDLE', classToHandle.name, Listener.name);
+        const { directory, classToHandle = Listener_js_1.default, extensions = ['.js', '.ts'], automateCategories, loadFilter, } = options ?? {};
+        if (!(classToHandle.prototype instanceof Listener_js_1.default ||
+            classToHandle === Listener_js_1.default)) {
+            throw new AkairoError_js_1.default('INVALID_CLASS_TO_HANDLE', classToHandle.name, Listener_js_1.default.name);
         }
         super(client, {
             directory,
@@ -24,7 +29,7 @@ export default class ListenerHandler extends AkairoHandler {
             automateCategories,
             loadFilter,
         });
-        this.emitters = new Collection();
+        this.emitters = new discord_js_1.Collection();
         this.emitters.set('client', this.client);
     }
     /**
@@ -34,12 +39,12 @@ export default class ListenerHandler extends AkairoHandler {
     addToEmitter(id) {
         const listener = this.modules.get(id.toString());
         if (!listener)
-            throw new AkairoError('MODULE_NOT_FOUND', this.classToHandle.name, id);
-        const emitter = Util.isEventEmitter(listener.emitter)
+            throw new AkairoError_js_1.default('MODULE_NOT_FOUND', this.classToHandle.name, id);
+        const emitter = Util_js_1.default.isEventEmitter(listener.emitter)
             ? listener.emitter
             : this.emitters.get(listener.emitter);
-        if (!Util.isEventEmitter(emitter))
-            throw new AkairoError('INVALID_TYPE', 'emitter', 'EventEmitter', true);
+        if (!Util_js_1.default.isEventEmitter(emitter))
+            throw new AkairoError_js_1.default('INVALID_TYPE', 'emitter', 'EventEmitter', true);
         emitter[listener.type ?? 'on'](listener.event, listener.exec);
         return listener;
     }
@@ -68,12 +73,12 @@ export default class ListenerHandler extends AkairoHandler {
     removeFromEmitter(id) {
         const listener = this.modules.get(id.toString());
         if (!listener)
-            throw new AkairoError('MODULE_NOT_FOUND', this.classToHandle.name, id);
-        const emitter = Util.isEventEmitter(listener.emitter)
+            throw new AkairoError_js_1.default('MODULE_NOT_FOUND', this.classToHandle.name, id);
+        const emitter = Util_js_1.default.isEventEmitter(listener.emitter)
             ? listener.emitter
             : this.emitters.get(listener.emitter);
-        if (!Util.isEventEmitter(emitter))
-            throw new AkairoError('INVALID_TYPE', 'emitter', 'EventEmitter', true);
+        if (!Util_js_1.default.isEventEmitter(emitter))
+            throw new AkairoError_js_1.default('INVALID_TYPE', 'emitter', 'EventEmitter', true);
         emitter.removeListener(listener.event, listener.exec);
         return listener;
     }
@@ -83,11 +88,12 @@ export default class ListenerHandler extends AkairoHandler {
      */
     setEmitters(emitters) {
         for (const [key, value] of Object.entries(emitters)) {
-            if (!Util.isEventEmitter(value))
-                throw new AkairoError('INVALID_TYPE', key, 'EventEmitter', true);
+            if (!Util_js_1.default.isEventEmitter(value))
+                throw new AkairoError_js_1.default('INVALID_TYPE', key, 'EventEmitter', true);
             this.emitters.set(key, value);
         }
         return this;
     }
 }
+exports.default = ListenerHandler;
 //# sourceMappingURL=ListenerHandler.js.map

@@ -1,4 +1,6 @@
-import { ArgumentMatches } from '../../util/Constants.js';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const Constants_js_1 = require("../../util/Constants.js");
 /*
  * Grammar:
  *
@@ -370,7 +372,7 @@ class Parser {
 /**
  * Parses content.
  */
-export default class ContentParser {
+class ContentParser {
     /**
      * @param options - Options.
      */
@@ -407,11 +409,11 @@ export default class ContentParser {
             optionFlagWords: [],
         };
         for (const arg of args) {
-            const arr = res[arg.match === ArgumentMatches.FLAG
+            const arr = res[arg.match === Constants_js_1.ArgumentMatches.FLAG
                 ? 'flagWords'
                 : 'optionFlagWords'];
-            if (arg.match === ArgumentMatches.FLAG ||
-                arg.match === ArgumentMatches.OPTION) {
+            if (arg.match === Constants_js_1.ArgumentMatches.FLAG ||
+                arg.match === Constants_js_1.ArgumentMatches.OPTION) {
                 if (Array.isArray(arg.flag)) {
                     arr.push(...arg.flag);
                 }
@@ -423,4 +425,5 @@ export default class ContentParser {
         return res;
     }
 }
+exports.default = ContentParser;
 //# sourceMappingURL=ContentParser.js.map

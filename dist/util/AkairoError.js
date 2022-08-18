@@ -1,3 +1,5 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const Messages = {
     // Module-related
     FILE_NOT_FOUND: (filename) => `File '${filename}' not found`,
@@ -19,7 +21,7 @@ const Messages = {
 /**
  * Represents an error for Akairo.
  */
-export default class AkairoError extends Error {
+class AkairoError extends Error {
     /**
      * @param key - Error key.
      * @param args - Arguments.
@@ -40,4 +42,5 @@ export default class AkairoError extends Error {
         return `AkairoError [${this.code}]`;
     }
 }
+exports.default = AkairoError;
 //# sourceMappingURL=AkairoError.js.map
