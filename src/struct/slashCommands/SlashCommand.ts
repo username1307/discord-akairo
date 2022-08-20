@@ -31,7 +31,7 @@ export default abstract class SlashCommand extends AkairoModule {
         | PermissionResolvable
         | PermissionResolvable[]
         | MissingPermissionSupplier;
-    public declare description: CommandDescription;
+    public declare description: string;
     public declare filepath: string;
     public declare handler: SlashCommandHandler;
     public declare hidden: boolean;
@@ -148,7 +148,7 @@ export interface SlashCommandOptions extends AkairoModuleOptions {
         | PermissionResolvable
         | PermissionResolvable[]
         | MissingPermissionSupplier;
-    description: CommandDescription;
+    description: string;
     guarded?: boolean;
     hidden?: boolean;
     ignorePermissions?: Snowflake | Snowflake[] | IgnoreCheckPredicate;
@@ -177,12 +177,6 @@ export type KeySupplier = (
 export type MissingPermissionSupplier = (
     message: Message | AkairoMessage
 ) => Promise<any> | any;
-
-export interface CommandDescription {
-    content: string;
-    usage?: string;
-    examples?: string[];
-}
 
 export interface AkairoApplicationCommandSubGroupData
     extends ApplicationCommandSubGroupData {

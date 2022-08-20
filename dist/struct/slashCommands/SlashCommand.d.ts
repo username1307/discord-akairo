@@ -9,7 +9,7 @@ export default abstract class SlashCommand extends AkairoModule {
     channel?: string;
     client: AkairoClient;
     clientPermissions?: PermissionResolvable | PermissionResolvable[] | MissingPermissionSupplier;
-    description: CommandDescription;
+    description: string;
     filepath: string;
     handler: SlashCommandHandler;
     hidden: boolean;
@@ -40,7 +40,7 @@ export interface SlashCommandOptions extends AkairoModuleOptions {
     before?: BeforeAction;
     channel?: 'guild' | 'dm';
     clientPermissions?: PermissionResolvable | PermissionResolvable[] | MissingPermissionSupplier;
-    description: CommandDescription;
+    description: string;
     guarded?: boolean;
     hidden?: boolean;
     ignorePermissions?: Snowflake | Snowflake[] | IgnoreCheckPredicate;
@@ -58,11 +58,6 @@ export interface SlashCommandOptions extends AkairoModuleOptions {
 export declare type BeforeAction = (message: Message) => any;
 export declare type KeySupplier = (message: Message | AkairoMessage, args: any) => string;
 export declare type MissingPermissionSupplier = (message: Message | AkairoMessage) => Promise<any> | any;
-export interface CommandDescription {
-    content: string;
-    usage?: string;
-    examples?: string[];
-}
 export interface AkairoApplicationCommandSubGroupData extends ApplicationCommandSubGroupData {
     options?: AkairoApplicationCommandSubCommandData[];
 }
