@@ -1,5 +1,5 @@
 /* eslint-disable func-names, @typescript-eslint/no-unused-vars */
-import type EventEmitter from 'events';
+import type * as EventEmitter from 'events';
 import AkairoError from '../../util/AkairoError.js';
 import type Category from '../../util/Category.js';
 import type AkairoClient from '../AkairoClient.js';

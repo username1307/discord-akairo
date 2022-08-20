@@ -1,21 +1,18 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = require("discord.js");
-const events_1 = __importDefault(require("events"));
-const fs_1 = __importDefault(require("fs"));
-const path_1 = __importDefault(require("path"));
-const url_1 = __importDefault(require("url"));
-const AkairoError_js_1 = __importDefault(require("../util/AkairoError.js"));
-const Category_js_1 = __importDefault(require("../util/Category.js"));
+const EventEmitter = require("events");
+const fs = require("fs");
+const path = require("path");
+const url = require("url");
+const AkairoError_js_1 = require("../util/AkairoError.js");
+const Category_js_1 = require("../util/Category.js");
 const Constants_js_1 = require("../util/Constants.js");
-const AkairoModule_js_1 = __importDefault(require("./AkairoModule.js"));
+const AkairoModule_js_1 = require("./AkairoModule.js");
 /**
  * Base class for handling modules.
  */
-class AkairoHandler extends events_1.default {
+class AkairoHandler extends EventEmitter {
     /**
      * @param client - The Akairo client.
      * @param options - Options for module loading and handling.
@@ -58,7 +55,7 @@ class AkairoHandler extends events_1.default {
      */
     async load(thing, isReload = false) {
         const isClass = typeof thing === 'function';
-        if (!isClass && !this.extensions.has(path_1.default.extname(thing)))
+        if (!isClass && !this.extensions.has(path.extname(thing)))
             return undefined;
         let mod = isClass
             ? thing
@@ -69,7 +66,7 @@ class AkairoHandler extends events_1.default {
                     return m;
                 return m.default ? findExport.call(this, m.default) : null;
                 // eslint-disable-next-line @typescript-eslint/no-var-requires
-            }.call(this, await eval(`import(${JSON.stringify(url_1.default.pathToFileURL(thing).toString())})`));
+            }.call(this, await eval(`import(${JSON.stringify(url.pathToFileURL(thing).toString())})`));
         if (mod && mod.prototype instanceof this.classToHandle) {
             mod = new mod(this); // eslint-disable-line new-cap
         }
@@ -95,7 +92,7 @@ class AkairoHandler extends events_1.default {
         const filepaths = AkairoHandler.readdirRecursive(directory);
         const promises = [];
         for (let filepath of filepaths) {
-            filepath = path_1.default.resolve(filepath);
+            filepath = path.resolve(filepath);
             if (filter(filepath))
                 promises.push(this.load(filepath));
         }
@@ -113,7 +110,7 @@ class AkairoHandler extends events_1.default {
         mod.handler = this;
         this.modules.set(mod.id, mod);
         if (mod.categoryID === 'default' && this.automateCategories) {
-            const dirs = path_1.default.dirname(filepath).split(path_1.default.sep);
+            const dirs = path.dirname(filepath).split(path.sep);
             mod.categoryID = dirs[dirs.length - 1];
         }
         if (!this.categories.has(mod.categoryID)) {
@@ -179,10 +176,10 @@ class AkairoHandler extends events_1.default {
     static readdirRecursive(directory) {
         const result = [];
         (function read(dir) {
-            const files = fs_1.default.readdirSync(dir);
+            const files = fs.readdirSync(dir);
             for (const file of files) {
-                const filepath = path_1.default.join(dir, file);
-                if (fs_1.default.statSync(filepath).isDirectory()) {
+                const filepath = path.join(dir, file);
+                if (fs.statSync(filepath).isDirectory()) {
                     read(filepath);
                 }
                 else {

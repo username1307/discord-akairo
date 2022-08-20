@@ -1,17 +1,14 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = require("discord.js");
-const AkairoError_js_1 = __importDefault(require("../../util/AkairoError.js"));
+const AkairoError_js_1 = require("../../util/AkairoError.js");
 const Constants_js_1 = require("../../util/Constants.js");
-const Util_js_1 = __importDefault(require("../../util/Util.js"));
-const AkairoHandler_js_1 = __importDefault(require("../AkairoHandler.js"));
-const TypeResolver_js_1 = __importDefault(require("./arguments/TypeResolver.js"));
-const MessageCommand_1 = __importDefault(require("./MessageCommand"));
-const MessageCommandUtil_1 = __importDefault(require("./MessageCommandUtil"));
-const Flag_js_1 = __importDefault(require("./Flag.js"));
+const Util_js_1 = require("../../util/Util.js");
+const AkairoHandler_js_1 = require("../AkairoHandler.js");
+const TypeResolver_js_1 = require("./arguments/TypeResolver.js");
+const MessageCommand_1 = require("./MessageCommand");
+const MessageCommandUtil_1 = require("./MessageCommandUtil");
+const Flag_js_1 = require("./Flag.js");
 /**
  * Loads messageCommands and handles messages.
  */

@@ -1,16 +1,13 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = require("discord.js");
-const AkairoError_1 = __importDefault(require("../../util/AkairoError"));
-const AkairoMessage_1 = __importDefault(require("../../util/AkairoMessage"));
+const AkairoError_1 = require("../../util/AkairoError");
+const AkairoMessage_1 = require("../../util/AkairoMessage");
 const Constants_1 = require("../../util/Constants");
-const Util_1 = __importDefault(require("../../util/Util"));
-const AkairoHandler_1 = __importDefault(require("../AkairoHandler"));
-const TypeResolver_1 = __importDefault(require("../messageCommands/arguments/TypeResolver"));
-const SlashCommand_1 = __importDefault(require("./SlashCommand"));
+const Util_1 = require("../../util/Util");
+const AkairoHandler_1 = require("../AkairoHandler");
+const TypeResolver_1 = require("../messageCommands/arguments/TypeResolver");
+const SlashCommand_1 = require("./SlashCommand");
 class SlashCommandHandler extends AkairoHandler_1.default {
     constructor(client, options) {
         const { directory, classToHandle = SlashCommand_1.default, extensions = ['.js', '.ts'], automateCategories, loadFilter, blockClient = true, blockBots = true, ignorePermissions = [], skipBuiltInPostInhibitors = false, } = options ?? {};

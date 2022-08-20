@@ -1,12 +1,9 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const AkairoError_js_1 = __importDefault(require("../../util/AkairoError.js"));
-const Util_js_1 = __importDefault(require("../../util/Util.js"));
-const AkairoHandler_js_1 = __importDefault(require("../AkairoHandler.js"));
-const Inhibitor_js_1 = __importDefault(require("./Inhibitor.js"));
+const AkairoError_js_1 = require("../../util/AkairoError.js");
+const Util_js_1 = require("../../util/Util.js");
+const AkairoHandler_js_1 = require("../AkairoHandler.js");
+const Inhibitor_js_1 = require("./Inhibitor.js");
 /**
  * Loads inhibitors and checks messages.
  */

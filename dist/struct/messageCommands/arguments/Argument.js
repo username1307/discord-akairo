@@ -1,11 +1,8 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const Constants_js_1 = require("../../../util/Constants.js");
-const Util_js_1 = __importDefault(require("../../../util/Util.js"));
-const Flag_js_1 = __importDefault(require("../Flag.js"));
+const Util_js_1 = require("../../../util/Util.js");
+const Flag_js_1 = require("../Flag.js");
 /**
  * Represents an argument for a command.
  */

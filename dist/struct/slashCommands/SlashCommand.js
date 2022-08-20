@@ -1,10 +1,7 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const AkairoError_1 = __importDefault(require("../../util/AkairoError"));
-const AkairoModule_1 = __importDefault(require("../AkairoModule"));
+const AkairoError_1 = require("../../util/AkairoError");
+const AkairoModule_1 = require("../AkairoModule");
 class SlashCommand extends AkairoModule_1.default {
     constructor(id, options) {
         super(id, { category: options?.category });

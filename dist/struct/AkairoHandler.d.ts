@@ -1,5 +1,5 @@
 import { Collection } from 'discord.js';
-import EventEmitter from 'events';
+import * as EventEmitter from 'events';
 import Category from '../util/Category.js';
 import type AkairoClient from './AkairoClient.js';
 import AkairoModule from './AkairoModule.js';

@@ -1,8 +1,8 @@
 import { Collection } from 'discord.js';
-import EventEmitter from 'events';
-import fs from 'fs';
-import path from 'path';
-import url from 'url';
+import * as EventEmitter from 'events';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as url from 'url';
 import AkairoError from '../util/AkairoError.js';
 import Category from '../util/Category.js';
 import { AkairoHandlerEvents } from '../util/Constants.js';

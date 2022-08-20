@@ -1,13 +1,10 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const AkairoError_js_1 = __importDefault(require("../../util/AkairoError.js"));
-const AkairoModule_js_1 = __importDefault(require("../AkairoModule.js"));
-const Argument_js_1 = __importDefault(require("./arguments/Argument.js"));
-const ArgumentRunner_js_1 = __importDefault(require("./arguments/ArgumentRunner.js"));
-const ContentParser_js_1 = __importDefault(require("./ContentParser.js"));
+const AkairoError_js_1 = require("../../util/AkairoError.js");
+const AkairoModule_js_1 = require("../AkairoModule.js");
+const Argument_js_1 = require("./arguments/Argument.js");
+const ArgumentRunner_js_1 = require("./arguments/ArgumentRunner.js");
+const ContentParser_js_1 = require("./ContentParser.js");
 /**
  * Represents a command.
  */

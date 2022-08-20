@@ -1,13 +1,10 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = require("discord.js");
-const AkairoError_js_1 = __importDefault(require("../../util/AkairoError.js"));
-const Util_js_1 = __importDefault(require("../../util/Util.js"));
-const AkairoHandler_js_1 = __importDefault(require("../AkairoHandler.js"));
-const Listener_js_1 = __importDefault(require("./Listener.js"));
+const AkairoError_js_1 = require("../../util/AkairoError.js");
+const Util_js_1 = require("../../util/Util.js");
+const AkairoHandler_js_1 = require("../AkairoHandler.js");
+const Listener_js_1 = require("./Listener.js");
 /**
  * Loads listeners and registers them with EventEmitters.
  */

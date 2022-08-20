@@ -5,7 +5,7 @@
     "target": "es2020",
     "outDir": "dist",
     "forceConsistentCasingInFileNames": true,
-    "esModuleInterop": true,
+    "esModuleInterop": false,
     "resolveJsonModule": true,
     "noErrorTruncation": true,
     "useUnknownInCatchVariables": false,
