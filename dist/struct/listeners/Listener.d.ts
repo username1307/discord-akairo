@@ -1,4 +1,4 @@
-import type * as EventEmitter from 'events';
+import type EventEmitter from 'events';
 import type Category from '../../util/Category.js';
 import type AkairoClient from '../AkairoClient.js';
 import AkairoModule, { AkairoModuleOptions } from '../AkairoModule.js';

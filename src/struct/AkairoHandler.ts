@@ -1,8 +1,8 @@
 import { Collection } from 'discord.js';
-import * as EventEmitter from 'events';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as url from 'url';
+import EventEmitter from 'events';
+import fs from 'fs';
+import path from 'path';
+import url from 'url';
 import AkairoError from '../util/AkairoError.js';
 import Category from '../util/Category.js';
 import { AkairoHandlerEvents } from '../util/Constants.js';
@@ -124,6 +124,38 @@ export default class AkairoHandler extends EventEmitter {
                   if (m.prototype instanceof this.classToHandle) return m;
                   return m.default ? findExport.call(this, m.default) : null;
                   // eslint-disable-next-line @typescript-eslint/no-var-requires
+              }.call(this, require(thing as string));
+
+        if (mod && mod.prototype instanceof this.classToHandle) {
+            mod = new mod(this); // eslint-disable-line new-cap
+        } else {
+            if (!isClass)
+                delete require.cache[require.resolve(thing as string)];
+            return undefined;
+        }
+
+        if (this.modules.has(mod.id))
+            throw new AkairoError(
+                'ALREADY_LOADED',
+                this.classToHandle.name,
+                mod.id
+            );
+
+        this.register(mod, isClass ? null! : (thing as string));
+        this.emit(AkairoHandlerEvents.LOAD, mod, isReload);
+        return mod;
+
+        /*const isClass = typeof thing === 'function';
+        if (!isClass && !this.extensions.has(path.extname(thing as string)))
+            return undefined;
+
+        let mod = isClass
+            ? thing
+            : function findExport(this: any, m: any): any {
+                  if (!m) return null;
+                  if (m.prototype instanceof this.classToHandle) return m;
+                  return m.default ? findExport.call(this, m.default) : null;
+                  // eslint-disable-next-line @typescript-eslint/no-var-requires
               }.call(
                   this,
                   await eval(
@@ -149,7 +181,7 @@ export default class AkairoHandler extends EventEmitter {
             );
         this.register(mod, isClass ? null! : (thing as string));
         this.emit(AkairoHandlerEvents.LOAD, mod, isReload);
-        return mod;
+        return mod;*/
     }
 
     /**

@@ -1,5 +1,5 @@
 import { Awaitable, Collection } from 'discord.js';
-import type * as EventEmitter from 'events';
+import type EventEmitter from 'events';
 import type { ListenerHandlerEvents } from '../../typings/events';
 import type Category from '../../util/Category.js';
 import type AkairoClient from '../AkairoClient.js';

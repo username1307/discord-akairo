@@ -1,9 +1,12 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const AkairoError_js_1 = require("../../../util/AkairoError.js");
+const AkairoError_js_1 = __importDefault(require("../../../util/AkairoError.js"));
 const Constants_js_1 = require("../../../util/Constants.js");
-const Flag_js_1 = require("../Flag.js");
-const Argument_js_1 = require("./Argument.js");
+const Flag_js_1 = __importDefault(require("../Flag.js"));
+const Argument_js_1 = __importDefault(require("./Argument.js"));
 /**
  * Runs arguments.
  */

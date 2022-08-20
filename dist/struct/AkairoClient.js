@@ -1,7 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = require("discord.js");
-const ClientUtil_js_1 = require("./ClientUtil.js");
+const ClientUtil_js_1 = __importDefault(require("./ClientUtil.js"));
 /**
  * The Akairo framework client. Creates the handlers and sets them up.
  */

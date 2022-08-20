@@ -1,9 +1,12 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 /* eslint-disable require-await */
 const discord_js_1 = require("discord.js");
-const AkairoMessage_js_1 = require("../../util/AkairoMessage.js");
-const MessageCommandHandler_1 = require("./MessageCommandHandler");
+const AkairoMessage_js_1 = __importDefault(require("../../util/AkairoMessage.js"));
+const MessageCommandHandler_1 = __importDefault(require("./MessageCommandHandler"));
 /**
  * MessageCommand utilities.
  */

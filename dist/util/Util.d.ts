@@ -1,4 +1,4 @@
-import type * as EventEmitter from 'events';
+import type EventEmitter from 'events';
 /**
  * Akairo Utilities.
  */
