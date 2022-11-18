@@ -9,7 +9,7 @@ export default abstract class SlashCommand extends AkairoModule {
     channel?: string;
     client: AkairoClient;
     clientPermissions?: PermissionResolvable | PermissionResolvable[] | MissingPermissionSupplier;
-    description: string;
+    description: CommandDescription;
     filepath: string;
     handler: SlashCommandHandler;
     hidden: boolean;
@@ -25,6 +25,7 @@ export default abstract class SlashCommand extends AkairoModule {
     shortName?: string;
     slashDefaultPermission: boolean;
     slashOptions?: SlashOption[];
+    slashLimitDeploy?: boolean;
     commandType: 'command' | 'group' | 'sub';
     userPermissions?: PermissionResolvable | PermissionResolvable[] | MissingPermissionSupplier;
     constructor(id: string, options?: SlashCommandOptions);
@@ -40,7 +41,7 @@ export interface SlashCommandOptions extends AkairoModuleOptions {
     before?: BeforeAction;
     channel?: 'guild' | 'dm';
     clientPermissions?: PermissionResolvable | PermissionResolvable[] | MissingPermissionSupplier;
-    description: string;
+    description: CommandDescription;
     guarded?: boolean;
     hidden?: boolean;
     ignorePermissions?: Snowflake | Snowflake[] | IgnoreCheckPredicate;
@@ -52,12 +53,18 @@ export interface SlashCommandOptions extends AkairoModuleOptions {
     shortName?: string;
     slashDefaultPermission?: boolean;
     slashOptions?: SlashOption[];
+    slashLimitDeploy?: boolean;
     commandType: 'command' | 'group' | 'sub';
     userPermissions?: PermissionResolvable | PermissionResolvable[] | MissingPermissionSupplier;
 }
 export declare type BeforeAction = (message: Message) => any;
 export declare type KeySupplier = (message: Message | AkairoMessage, args: any) => string;
 export declare type MissingPermissionSupplier = (message: Message | AkairoMessage) => Promise<any> | any;
+export interface CommandDescription {
+    content: string;
+    usage?: string;
+    examples?: string[];
+}
 export interface AkairoApplicationCommandSubGroupData extends ApplicationCommandSubGroupData {
     options?: AkairoApplicationCommandSubCommandData[];
 }

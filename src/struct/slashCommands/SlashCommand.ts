@@ -31,7 +31,7 @@ export default abstract class SlashCommand extends AkairoModule {
         | PermissionResolvable
         | PermissionResolvable[]
         | MissingPermissionSupplier;
-    public declare description: string;
+    public declare description: CommandDescription;
     public declare filepath: string;
     public declare handler: SlashCommandHandler;
     public declare hidden: boolean;
@@ -50,6 +50,7 @@ export default abstract class SlashCommand extends AkairoModule {
     public declare shortName?: string;
     public declare slashDefaultPermission: boolean;
     public declare slashOptions?: SlashOption[];
+    public declare slashLimitDeploy?: boolean;
     public declare commandType: 'command' | 'group' | 'sub';
     public declare userPermissions?:
         | PermissionResolvable
@@ -75,6 +76,7 @@ export default abstract class SlashCommand extends AkairoModule {
             shortName,
             slashDefaultPermission,
             slashOptions = [],
+            slashLimitDeploy = false,
             commandType,
             userPermissions = this.userPermissions,
         } = options ?? {};
@@ -115,6 +117,7 @@ export default abstract class SlashCommand extends AkairoModule {
         this.shortName = shortName;
         this.slashDefaultPermission = slashDefaultPermission!;
         this.slashOptions = slashOptions;
+        this.slashLimitDeploy = slashLimitDeploy;
         this.commandType = commandType!;
     }
 
@@ -148,7 +151,7 @@ export interface SlashCommandOptions extends AkairoModuleOptions {
         | PermissionResolvable
         | PermissionResolvable[]
         | MissingPermissionSupplier;
-    description: string;
+    description: CommandDescription;
     guarded?: boolean;
     hidden?: boolean;
     ignorePermissions?: Snowflake | Snowflake[] | IgnoreCheckPredicate;
@@ -160,6 +163,7 @@ export interface SlashCommandOptions extends AkairoModuleOptions {
     shortName?: string;
     slashDefaultPermission?: boolean;
     slashOptions?: SlashOption[];
+    slashLimitDeploy?: boolean;
     commandType: 'command' | 'group' | 'sub';
     userPermissions?:
         | PermissionResolvable
@@ -177,6 +181,12 @@ export type KeySupplier = (
 export type MissingPermissionSupplier = (
     message: Message | AkairoMessage
 ) => Promise<any> | any;
+
+export interface CommandDescription {
+    content: string;
+    usage?: string;
+    examples?: string[];
+}
 
 export interface AkairoApplicationCommandSubGroupData
     extends ApplicationCommandSubGroupData {
