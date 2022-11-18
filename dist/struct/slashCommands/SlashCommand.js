@@ -8,7 +8,7 @@ const AkairoModule_1 = __importDefault(require("../AkairoModule"));
 class SlashCommand extends AkairoModule_1.default {
     constructor(id, options) {
         super(id, { category: options?.category });
-        const { before = this.before || (() => undefined), channel = null, clientPermissions = this.clientPermissions, description, guarded = false, hidden = false, ignorePermissions, lock, name, ownerOnly = false, parentCommand, prefixId, shortName, slashDefaultPermission, slashOptions = [], commandType, userPermissions = this.userPermissions, } = options ?? {};
+        const { before = this.before || (() => undefined), channel = null, clientPermissions = this.clientPermissions, description, guarded = false, hidden = false, ignorePermissions, lock, name, ownerOnly = false, parentCommand, prefixId, shortName, slashDefaultPermission, slashOptions = [], slashLimitDeploy = false, commandType, userPermissions = this.userPermissions, } = options ?? {};
         this.before = before.bind(this);
         this.channel = channel;
         this.clientPermissions =
@@ -43,6 +43,7 @@ class SlashCommand extends AkairoModule_1.default {
         this.shortName = shortName;
         this.slashDefaultPermission = slashDefaultPermission;
         this.slashOptions = slashOptions;
+        this.slashLimitDeploy = slashLimitDeploy;
         this.commandType = commandType;
     }
     before(message) { }
